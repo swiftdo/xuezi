@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'dart:math';
 import '../../domain/entities/learning_record.dart';
 import '../bloc/learning_statistics_bloc.dart';
 import '../theme/app_colors.dart';
@@ -34,6 +35,7 @@ class LearningStatisticsPage extends StatelessWidget {
                   _buildMasteryDistribution(masteryCount),
                   const SizedBox(height: 24),
                   _buildRecentRecords(records),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -61,39 +63,44 @@ class LearningStatisticsPage extends StatelessWidget {
             minutes: totalTime.inMinutes ~/
                 (totalKnownCharacters + totalUnknownCharacters));
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.5,
-      children: [
-        _buildSummaryCard(
-          title: '总学习时间',
-          value: '${totalTime.inHours}小时${totalTime.inMinutes % 60}分钟',
-          icon: Icons.timer,
-          color: AppColors.primary,
-        ),
-        _buildSummaryCard(
-          title: '已掌握汉字',
-          value: '$totalKnownCharacters个',
-          icon: Icons.check_circle,
-          color: AppColors.accent,
-        ),
-        _buildSummaryCard(
-          title: '需要复习',
-          value: '$totalUnknownCharacters个',
-          icon: Icons.refresh,
-          color: AppColors.warning,
-        ),
-        _buildSummaryCard(
-          title: '平均时间/字',
-          value: '${averageTimePerCharacter.inMinutes}分钟',
-          icon: Icons.speed,
-          color: AppColors.success,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth > 600 ? 4 : 2;
+        return GridView.count(
+          crossAxisCount: crossAxisCount,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 1.5,
+          children: [
+            _buildSummaryCard(
+              title: '总学习时间',
+              value: '${totalTime.inHours}小时${totalTime.inMinutes % 60}分钟',
+              icon: Icons.timer,
+              color: AppColors.primary,
+            ),
+            _buildSummaryCard(
+              title: '已掌握汉字',
+              value: '$totalKnownCharacters个',
+              icon: Icons.check_circle,
+              color: AppColors.accent,
+            ),
+            _buildSummaryCard(
+              title: '需要复习',
+              value: '$totalUnknownCharacters个',
+              icon: Icons.refresh,
+              color: AppColors.warning,
+            ),
+            _buildSummaryCard(
+              title: '平均时间/字',
+              value: '${averageTimePerCharacter.inMinutes}分钟',
+              icon: Icons.speed,
+              color: AppColors.success,
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -140,12 +147,20 @@ class LearningStatisticsPage extends StatelessWidget {
     }
 
     final dailyStats = _calculateDailyStats(records);
-    final spots = dailyStats.entries
-        .map((e) => FlSpot(
-              e.key.millisecondsSinceEpoch.toDouble(),
-              e.value.charactersLearned.toDouble(),
-            ))
-        .toList();
+    final sortedDates = dailyStats.keys.toList()..sort();
+
+    if (sortedDates.isEmpty) {
+      return const SizedBox();
+    }
+
+    final maxCharacters = dailyStats.values
+        .map((stats) => stats.charactersLearned)
+        .reduce(max)
+        .toDouble();
+    final maxTime = dailyStats.values
+        .map((stats) => stats.totalTime.inMinutes)
+        .reduce(max)
+        .toDouble();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,26 +175,50 @@ class LearningStatisticsPage extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 200,
+          height: 300,
           child: LineChart(
             LineChartData(
-              gridData: FlGridData(show: true),
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: true,
+                horizontalInterval: maxCharacters / 5,
+                getDrawingHorizontalLine: (value) => FlLine(
+                  color: AppColors.neutral4,
+                  strokeWidth: 1,
+                ),
+                getDrawingVerticalLine: (value) => FlLine(
+                  color: AppColors.neutral4,
+                  strokeWidth: 1,
+                ),
+              ),
               titlesData: FlTitlesData(
+                show: true,
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     getTitlesWidget: (value, meta) {
-                      final date =
-                          DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                      return Text(
-                        '${date.month}/${date.day}',
-                        style: TextStyle(
-                          color: AppColors.neutral2,
-                          fontSize: 12,
+                      if (value.toInt() >= sortedDates.length) {
+                        return const SizedBox();
+                      }
+                      final date = sortedDates[value.toInt()];
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          '${date.month}/${date.day}',
+                          style: TextStyle(
+                            color: AppColors.neutral2,
+                            fontSize: 12,
+                          ),
                         ),
                       );
                     },
-                    interval: 24 * 3600 * 1000,
+                    reservedSize: 30,
                   ),
                 ),
                 leftTitles: AxisTitles(
@@ -194,39 +233,131 @@ class LearningStatisticsPage extends StatelessWidget {
                         ),
                       );
                     },
+                    reservedSize: 40,
                   ),
-                ),
-                rightTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                topTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
                 ),
               ),
+              borderData: FlBorderData(
+                show: true,
+                border: Border.all(color: AppColors.neutral4),
+              ),
+              minX: 0,
+              maxX: (sortedDates.length - 1).toDouble(),
+              minY: 0,
+              maxY: maxCharacters + (maxCharacters * 0.1),
               lineBarsData: [
+                // 学习汉字数量曲线
                 LineChartBarData(
-                  spots: spots,
+                  spots: List.generate(sortedDates.length, (index) {
+                    final date = sortedDates[index];
+                    final stats = dailyStats[date]!;
+                    return FlSpot(
+                      index.toDouble(),
+                      stats.charactersLearned.toDouble(),
+                    );
+                  }),
                   isCurved: true,
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primary.withOpacity(0.5),
-                      AppColors.primary,
-                    ],
-                  ),
+                  color: AppColors.primary,
                   barWidth: 3,
-                  dotData: const FlDotData(show: true),
+                  isStrokeCapRound: true,
+                  dotData: FlDotData(
+                    show: true,
+                    getDotPainter: (spot, percent, bar, index) {
+                      return FlDotCirclePainter(
+                        radius: 4,
+                        color: AppColors.primary,
+                        strokeWidth: 2,
+                        strokeColor: Colors.white,
+                      );
+                    },
+                  ),
                   belowBarData: BarAreaData(
                     show: true,
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primary.withOpacity(0.1),
-                        AppColors.primary.withOpacity(0.2),
-                      ],
-                    ),
+                    color: AppColors.primary.withOpacity(0.1),
+                  ),
+                ),
+                // 学习时间曲线（分钟）
+                LineChartBarData(
+                  spots: List.generate(sortedDates.length, (index) {
+                    final date = sortedDates[index];
+                    final stats = dailyStats[date]!;
+                    return FlSpot(
+                      index.toDouble(),
+                      (stats.totalTime.inMinutes.toDouble() *
+                          maxCharacters /
+                          maxTime),
+                    );
+                  }),
+                  isCurved: true,
+                  color: AppColors.accent,
+                  barWidth: 3,
+                  isStrokeCapRound: true,
+                  dotData: FlDotData(
+                    show: true,
+                    getDotPainter: (spot, percent, bar, index) {
+                      return FlDotCirclePainter(
+                        radius: 4,
+                        color: AppColors.accent,
+                        strokeWidth: 2,
+                        strokeColor: Colors.white,
+                      );
+                    },
                   ),
                 ),
               ],
+              extraLinesData: ExtraLinesData(
+                horizontalLines: [
+                  HorizontalLine(
+                    y: records.first.targetCharactersPerDay.toDouble(),
+                    color: AppColors.warning.withOpacity(0.5),
+                    strokeWidth: 2,
+                    dashArray: [5, 5],
+                    label: HorizontalLineLabel(
+                      show: true,
+                      alignment: Alignment.topRight,
+                      padding: const EdgeInsets.only(right: 8, bottom: 4),
+                      style: TextStyle(
+                        color: AppColors.warning,
+                        fontSize: 12,
+                      ),
+                      labelResolver: (line) => '目标: ${line.y.toInt()}字/天',
+                    ),
+                  ),
+                ],
+              ),
             ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildChartLegend(AppColors.primary, '学习汉字数'),
+            const SizedBox(width: 24),
+            _buildChartLegend(AppColors.accent, '学习时间'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChartLegend(Color color, String label) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: AppColors.neutral2,
+            fontSize: 12,
           ),
         ),
       ],
@@ -241,44 +372,55 @@ class LearningStatisticsPage extends StatelessWidget {
       '需要复习': masteryCount.values.where((v) => v <= 0).length,
     };
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '掌握程度分布',
-          style: TextStyle(
-            color: AppColors.neutral1,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 300),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '掌握程度分布',
+            style: TextStyle(
+              color: AppColors.neutral1,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        ...categories.entries.map((e) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${e.key} (${e.value}个)',
-                    style: TextStyle(
-                      color: AppColors.neutral2,
-                      fontSize: 14,
-                    ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: PieChart(
+              PieChartData(
+                sections: [
+                  PieChartSectionData(
+                    value: categories['熟练']!.toDouble(),
+                    title: '熟练\n${categories['熟练']}',
+                    color: AppColors.success,
+                    radius: 60,
                   ),
-                  const SizedBox(height: 4),
-                  LinearProgressIndicator(
-                    value: categories.values.fold(0, (a, b) => a + b) == 0
-                        ? 0
-                        : e.value / categories.values.fold(0, (a, b) => a + b),
-                    backgroundColor: AppColors.neutral4,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      _getMasteryColor(e.key),
-                    ),
+                  PieChartSectionData(
+                    value: categories['掌握']!.toDouble(),
+                    title: '掌握\n${categories['掌握']}',
+                    color: AppColors.primary,
+                    radius: 60,
+                  ),
+                  PieChartSectionData(
+                    value: categories['学习中']!.toDouble(),
+                    title: '学习中\n${categories['学习中']}',
+                    color: AppColors.accent,
+                    radius: 60,
+                  ),
+                  PieChartSectionData(
+                    value: categories['需要复习']!.toDouble(),
+                    title: '需要复习\n${categories['需要复习']}',
+                    color: AppColors.warning,
+                    radius: 60,
                   ),
                 ],
               ),
-            )),
-      ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -319,21 +461,6 @@ class LearningStatisticsPage extends StatelessWidget {
             )),
       ],
     );
-  }
-
-  Color _getMasteryColor(String category) {
-    switch (category) {
-      case '熟练':
-        return AppColors.success;
-      case '掌握':
-        return AppColors.primary;
-      case '学习中':
-        return AppColors.accent;
-      case '需要复习':
-        return AppColors.warning;
-      default:
-        return AppColors.neutral3;
-    }
   }
 
   String _formatDate(DateTime date) {

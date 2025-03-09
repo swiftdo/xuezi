@@ -24,6 +24,7 @@ mixin _$LearningSessionEvent {
     required TResult Function(String character, bool isKnown) characterLearned,
     required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
+    required TResult Function() restart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -34,6 +35,7 @@ mixin _$LearningSessionEvent {
     TResult? Function(String character, bool isKnown)? characterLearned,
     TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
+    TResult? Function()? restart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -44,6 +46,7 @@ mixin _$LearningSessionEvent {
     TResult Function(String character, bool isKnown)? characterLearned,
     TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
+    TResult Function()? restart,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -55,6 +58,7 @@ mixin _$LearningSessionEvent {
     required TResult Function(_CharacterLearned value) characterLearned,
     required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
+    required TResult Function(_Restart value) restart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -65,6 +69,7 @@ mixin _$LearningSessionEvent {
     TResult? Function(_CharacterLearned value)? characterLearned,
     TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
+    TResult? Function(_Restart value)? restart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -75,6 +80,7 @@ mixin _$LearningSessionEvent {
     TResult Function(_CharacterLearned value)? characterLearned,
     TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
+    TResult Function(_Restart value)? restart,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -149,6 +155,7 @@ class _$StartedImpl implements _Started {
     required TResult Function(String character, bool isKnown) characterLearned,
     required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
+    required TResult Function() restart,
   }) {
     return started();
   }
@@ -162,6 +169,7 @@ class _$StartedImpl implements _Started {
     TResult? Function(String character, bool isKnown)? characterLearned,
     TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
+    TResult? Function()? restart,
   }) {
     return started?.call();
   }
@@ -175,6 +183,7 @@ class _$StartedImpl implements _Started {
     TResult Function(String character, bool isKnown)? characterLearned,
     TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
+    TResult Function()? restart,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -192,6 +201,7 @@ class _$StartedImpl implements _Started {
     required TResult Function(_CharacterLearned value) characterLearned,
     required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
+    required TResult Function(_Restart value) restart,
   }) {
     return started(this);
   }
@@ -205,6 +215,7 @@ class _$StartedImpl implements _Started {
     TResult? Function(_CharacterLearned value)? characterLearned,
     TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
+    TResult? Function(_Restart value)? restart,
   }) {
     return started?.call(this);
   }
@@ -218,6 +229,7 @@ class _$StartedImpl implements _Started {
     TResult Function(_CharacterLearned value)? characterLearned,
     TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
+    TResult Function(_Restart value)? restart,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -278,6 +290,7 @@ class _$PausedImpl implements _Paused {
     required TResult Function(String character, bool isKnown) characterLearned,
     required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
+    required TResult Function() restart,
   }) {
     return paused();
   }
@@ -291,6 +304,7 @@ class _$PausedImpl implements _Paused {
     TResult? Function(String character, bool isKnown)? characterLearned,
     TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
+    TResult? Function()? restart,
   }) {
     return paused?.call();
   }
@@ -304,6 +318,7 @@ class _$PausedImpl implements _Paused {
     TResult Function(String character, bool isKnown)? characterLearned,
     TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
+    TResult Function()? restart,
     required TResult orElse(),
   }) {
     if (paused != null) {
@@ -321,6 +336,7 @@ class _$PausedImpl implements _Paused {
     required TResult Function(_CharacterLearned value) characterLearned,
     required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
+    required TResult Function(_Restart value) restart,
   }) {
     return paused(this);
   }
@@ -334,6 +350,7 @@ class _$PausedImpl implements _Paused {
     TResult? Function(_CharacterLearned value)? characterLearned,
     TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
+    TResult? Function(_Restart value)? restart,
   }) {
     return paused?.call(this);
   }
@@ -347,6 +364,7 @@ class _$PausedImpl implements _Paused {
     TResult Function(_CharacterLearned value)? characterLearned,
     TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
+    TResult Function(_Restart value)? restart,
     required TResult orElse(),
   }) {
     if (paused != null) {
@@ -407,6 +425,7 @@ class _$ResumedImpl implements _Resumed {
     required TResult Function(String character, bool isKnown) characterLearned,
     required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
+    required TResult Function() restart,
   }) {
     return resumed();
   }
@@ -420,6 +439,7 @@ class _$ResumedImpl implements _Resumed {
     TResult? Function(String character, bool isKnown)? characterLearned,
     TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
+    TResult? Function()? restart,
   }) {
     return resumed?.call();
   }
@@ -433,6 +453,7 @@ class _$ResumedImpl implements _Resumed {
     TResult Function(String character, bool isKnown)? characterLearned,
     TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
+    TResult Function()? restart,
     required TResult orElse(),
   }) {
     if (resumed != null) {
@@ -450,6 +471,7 @@ class _$ResumedImpl implements _Resumed {
     required TResult Function(_CharacterLearned value) characterLearned,
     required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
+    required TResult Function(_Restart value) restart,
   }) {
     return resumed(this);
   }
@@ -463,6 +485,7 @@ class _$ResumedImpl implements _Resumed {
     TResult? Function(_CharacterLearned value)? characterLearned,
     TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
+    TResult? Function(_Restart value)? restart,
   }) {
     return resumed?.call(this);
   }
@@ -476,6 +499,7 @@ class _$ResumedImpl implements _Resumed {
     TResult Function(_CharacterLearned value)? characterLearned,
     TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
+    TResult Function(_Restart value)? restart,
     required TResult orElse(),
   }) {
     if (resumed != null) {
@@ -574,6 +598,7 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     required TResult Function(String character, bool isKnown) characterLearned,
     required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
+    required TResult Function() restart,
   }) {
     return characterLearned(character, isKnown);
   }
@@ -587,6 +612,7 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     TResult? Function(String character, bool isKnown)? characterLearned,
     TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
+    TResult? Function()? restart,
   }) {
     return characterLearned?.call(character, isKnown);
   }
@@ -600,6 +626,7 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     TResult Function(String character, bool isKnown)? characterLearned,
     TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
+    TResult Function()? restart,
     required TResult orElse(),
   }) {
     if (characterLearned != null) {
@@ -617,6 +644,7 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     required TResult Function(_CharacterLearned value) characterLearned,
     required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
+    required TResult Function(_Restart value) restart,
   }) {
     return characterLearned(this);
   }
@@ -630,6 +658,7 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     TResult? Function(_CharacterLearned value)? characterLearned,
     TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
+    TResult? Function(_Restart value)? restart,
   }) {
     return characterLearned?.call(this);
   }
@@ -643,6 +672,7 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     TResult Function(_CharacterLearned value)? characterLearned,
     TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
+    TResult Function(_Restart value)? restart,
     required TResult orElse(),
   }) {
     if (characterLearned != null) {
@@ -743,6 +773,7 @@ class _$CharacterUndoneImpl implements _CharacterUndone {
     required TResult Function(String character, bool isKnown) characterLearned,
     required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
+    required TResult Function() restart,
   }) {
     return characterUndone(character);
   }
@@ -756,6 +787,7 @@ class _$CharacterUndoneImpl implements _CharacterUndone {
     TResult? Function(String character, bool isKnown)? characterLearned,
     TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
+    TResult? Function()? restart,
   }) {
     return characterUndone?.call(character);
   }
@@ -769,6 +801,7 @@ class _$CharacterUndoneImpl implements _CharacterUndone {
     TResult Function(String character, bool isKnown)? characterLearned,
     TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
+    TResult Function()? restart,
     required TResult orElse(),
   }) {
     if (characterUndone != null) {
@@ -786,6 +819,7 @@ class _$CharacterUndoneImpl implements _CharacterUndone {
     required TResult Function(_CharacterLearned value) characterLearned,
     required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
+    required TResult Function(_Restart value) restart,
   }) {
     return characterUndone(this);
   }
@@ -799,6 +833,7 @@ class _$CharacterUndoneImpl implements _CharacterUndone {
     TResult? Function(_CharacterLearned value)? characterLearned,
     TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
+    TResult? Function(_Restart value)? restart,
   }) {
     return characterUndone?.call(this);
   }
@@ -812,6 +847,7 @@ class _$CharacterUndoneImpl implements _CharacterUndone {
     TResult Function(_CharacterLearned value)? characterLearned,
     TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
+    TResult Function(_Restart value)? restart,
     required TResult orElse(),
   }) {
     if (characterUndone != null) {
@@ -881,6 +917,7 @@ class _$EndSessionImpl implements _EndSession {
     required TResult Function(String character, bool isKnown) characterLearned,
     required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
+    required TResult Function() restart,
   }) {
     return endSession();
   }
@@ -894,6 +931,7 @@ class _$EndSessionImpl implements _EndSession {
     TResult? Function(String character, bool isKnown)? characterLearned,
     TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
+    TResult? Function()? restart,
   }) {
     return endSession?.call();
   }
@@ -907,6 +945,7 @@ class _$EndSessionImpl implements _EndSession {
     TResult Function(String character, bool isKnown)? characterLearned,
     TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
+    TResult Function()? restart,
     required TResult orElse(),
   }) {
     if (endSession != null) {
@@ -924,6 +963,7 @@ class _$EndSessionImpl implements _EndSession {
     required TResult Function(_CharacterLearned value) characterLearned,
     required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
+    required TResult Function(_Restart value) restart,
   }) {
     return endSession(this);
   }
@@ -937,6 +977,7 @@ class _$EndSessionImpl implements _EndSession {
     TResult? Function(_CharacterLearned value)? characterLearned,
     TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
+    TResult? Function(_Restart value)? restart,
   }) {
     return endSession?.call(this);
   }
@@ -950,6 +991,7 @@ class _$EndSessionImpl implements _EndSession {
     TResult Function(_CharacterLearned value)? characterLearned,
     TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
+    TResult Function(_Restart value)? restart,
     required TResult orElse(),
   }) {
     if (endSession != null) {
@@ -961,6 +1003,141 @@ class _$EndSessionImpl implements _EndSession {
 
 abstract class _EndSession implements LearningSessionEvent {
   const factory _EndSession() = _$EndSessionImpl;
+}
+
+/// @nodoc
+abstract class _$$RestartImplCopyWith<$Res> {
+  factory _$$RestartImplCopyWith(
+          _$RestartImpl value, $Res Function(_$RestartImpl) then) =
+      __$$RestartImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$RestartImplCopyWithImpl<$Res>
+    extends _$LearningSessionEventCopyWithImpl<$Res, _$RestartImpl>
+    implements _$$RestartImplCopyWith<$Res> {
+  __$$RestartImplCopyWithImpl(
+      _$RestartImpl _value, $Res Function(_$RestartImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of LearningSessionEvent
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$RestartImpl implements _Restart {
+  const _$RestartImpl();
+
+  @override
+  String toString() {
+    return 'LearningSessionEvent.restart()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$RestartImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() started,
+    required TResult Function() paused,
+    required TResult Function() resumed,
+    required TResult Function(String character, bool isKnown) characterLearned,
+    required TResult Function(String character) characterUndone,
+    required TResult Function() endSession,
+    required TResult Function() restart,
+  }) {
+    return restart();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? started,
+    TResult? Function()? paused,
+    TResult? Function()? resumed,
+    TResult? Function(String character, bool isKnown)? characterLearned,
+    TResult? Function(String character)? characterUndone,
+    TResult? Function()? endSession,
+    TResult? Function()? restart,
+  }) {
+    return restart?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? started,
+    TResult Function()? paused,
+    TResult Function()? resumed,
+    TResult Function(String character, bool isKnown)? characterLearned,
+    TResult Function(String character)? characterUndone,
+    TResult Function()? endSession,
+    TResult Function()? restart,
+    required TResult orElse(),
+  }) {
+    if (restart != null) {
+      return restart();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Started value) started,
+    required TResult Function(_Paused value) paused,
+    required TResult Function(_Resumed value) resumed,
+    required TResult Function(_CharacterLearned value) characterLearned,
+    required TResult Function(_CharacterUndone value) characterUndone,
+    required TResult Function(_EndSession value) endSession,
+    required TResult Function(_Restart value) restart,
+  }) {
+    return restart(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Started value)? started,
+    TResult? Function(_Paused value)? paused,
+    TResult? Function(_Resumed value)? resumed,
+    TResult? Function(_CharacterLearned value)? characterLearned,
+    TResult? Function(_CharacterUndone value)? characterUndone,
+    TResult? Function(_EndSession value)? endSession,
+    TResult? Function(_Restart value)? restart,
+  }) {
+    return restart?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Started value)? started,
+    TResult Function(_Paused value)? paused,
+    TResult Function(_Resumed value)? resumed,
+    TResult Function(_CharacterLearned value)? characterLearned,
+    TResult Function(_CharacterUndone value)? characterUndone,
+    TResult Function(_EndSession value)? endSession,
+    TResult Function(_Restart value)? restart,
+    required TResult orElse(),
+  }) {
+    if (restart != null) {
+      return restart(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _Restart implements LearningSessionEvent {
+  const factory _Restart() = _$RestartImpl;
 }
 
 /// @nodoc

@@ -124,7 +124,19 @@ class LearningPlanListPage extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
-                  onPressed: () => context.push('/plan/edit/${plan.id}'),
+                  onPressed: () async {
+                    if (!context.mounted) return;
+                    await context
+                        .push<void>(
+                      '/plan/edit/${plan.id}',
+                    )
+                        .then((_) {
+                      if (!context.mounted) return;
+                      context.read<LearningPlanBloc>().add(
+                            const LearningPlanEvent.started(),
+                          );
+                    });
+                  },
                   tooltip: '编辑',
                 ),
                 IconButton(

@@ -13,4 +13,5 @@ class LearningSessionEvent with _$LearningSessionEvent {
     required String character,
   }) = _CharacterUndone;
   const factory LearningSessionEvent.endSession() = _EndSession;
+  const factory LearningSessionEvent.restart() = _Restart;
 }

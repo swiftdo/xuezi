@@ -38,7 +38,12 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
         widget.plan,
         getIt<LearningRecordRepository>(),
       )..add(const LearningSessionEvent.started()),
-      child: BlocBuilder<LearningSessionBloc, LearningSessionState>(
+      child: BlocConsumer<LearningSessionBloc, LearningSessionState>(
+        listener: (context, state) {
+          // Add debug print to verify state updates
+          print('Known characters: ${state.knownCharacters.length}');
+          print('Unknown characters: ${state.unknownCharacters.length}');
+        },
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
@@ -63,8 +68,41 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
                   child: CardSwiper(
                     controller: controller,
                     cardsCount: state.characters.length,
-                    onSwipe: _onSwipe,
-                    onUndo: _onUndo,
+                    onSwipe: (previousIndex, currentIndex, direction) {
+                      if (currentIndex != null) {
+                        setState(() {
+                          this.currentIndex = currentIndex;
+                        });
+                        context.read<LearningSessionBloc>().add(
+                              LearningSessionEvent.characterLearned(
+                                character: state.characters[previousIndex],
+                                isKnown: direction == CardSwiperDirection.right,
+                              ),
+                            );
+
+                        // Check if this was the last card
+                        if (currentIndex >= state.characters.length - 1) {
+                          // Show summary dialog after a short delay
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            _showEndSessionDialog(context, state);
+                          });
+                        }
+                      }
+                      return true;
+                    },
+                    onUndo: (previousIndex, currentIndex, direction) {
+                      setState(() {
+                        this.currentIndex = currentIndex;
+                      });
+                      if (previousIndex != null) {
+                        context.read<LearningSessionBloc>().add(
+                              LearningSessionEvent.characterUndone(
+                                character: state.characters[previousIndex],
+                              ),
+                            );
+                      }
+                      return true;
+                    },
                     isLoop: false,
                     numberOfCardsDisplayed: 3,
                     backCardOffset: const Offset(40, 40),
@@ -100,52 +138,200 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 0, end: timeProgress),
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            builder: (context, value, child) {
-              return Column(
-                children: [
-                  LinearProgressIndicator(
-                    value: value.clamp(0.0, 1.0),
-                    backgroundColor: AppColors.neutral4,
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(AppColors.primary),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '学习时间: ${totalTime.inMinutes}/${state.plan.targetStudyTimePerDay.inMinutes} 分钟',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              );
-            },
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: timeProgress),
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                      builder: (context, value, child) {
+                        return Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  value: value.clamp(0.0, 1.0),
+                                  backgroundColor: AppColors.neutral4,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    value >= 1.0
+                                        ? AppColors.success
+                                        : AppColors.primary,
+                                  ),
+                                  strokeWidth: 8,
+                                ),
+                                Text(
+                                  '${(value * 100).toInt()}%',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: value >= 1.0
+                                            ? AppColors.success
+                                            : AppColors.primary,
+                                      ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '学习时间',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            Text(
+                              '${totalTime.inMinutes}/${state.plan.targetStudyTimePerDay.inMinutes} 分钟',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: AppColors.neutral2,
+                                  ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: characterProgress),
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                      builder: (context, value, child) {
+                        return Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  value: value.clamp(0.0, 1.0),
+                                  backgroundColor: AppColors.neutral4,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    value >= 1.0
+                                        ? AppColors.success
+                                        : AppColors.accent,
+                                  ),
+                                  strokeWidth: 8,
+                                ),
+                                Text(
+                                  '${(value * 100).toInt()}%',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: value >= 1.0
+                                            ? AppColors.success
+                                            : AppColors.accent,
+                                      ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '学习进度',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            Text(
+                              '${state.knownCharacters.length + state.unknownCharacters.length}/${state.plan.targetCharactersPerDay} 个汉字',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: AppColors.neutral2,
+                                  ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
-          TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 0, end: characterProgress),
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            builder: (context, value, child) {
-              return Column(
-                children: [
-                  LinearProgressIndicator(
-                    value: value.clamp(0.0, 1.0),
-                    backgroundColor: AppColors.neutral4,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '已学习: ${state.knownCharacters.length + state.unknownCharacters.length}/${state.plan.targetCharactersPerDay} 个汉字',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              );
-            },
-          ),
+          if (state.knownCharacters.isNotEmpty ||
+              state.unknownCharacters.isNotEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '当前学习情况',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildMasteryIndicator(
+                            context,
+                            '已掌握',
+                            state.knownCharacters.length,
+                            AppColors.success,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildMasteryIndicator(
+                            context,
+                            '需要复习',
+                            state.unknownCharacters.length,
+                            AppColors.warning,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMasteryIndicator(
+    BuildContext context,
+    String label,
+    int count,
+    Color color,
+  ) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '$count',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        Text(
+          '个汉字',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.neutral2,
+              ),
+        ),
+      ],
     );
   }
 
@@ -280,7 +466,35 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
         content: const Text('确定要结束本次学习吗？'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+              // Replace current page with a new instance
+              if (!mounted) return;
+              // Create a new bloc and replace the current one
+              final newBloc = LearningSessionBloc(
+                widget.plan,
+                getIt<LearningRecordRepository>(),
+              )..add(const LearningSessionEvent.started());
+
+              // Replace the bloc
+              context.read<LearningSessionBloc>().close();
+              setState(() {
+                currentIndex = 0;
+              });
+
+              // Rebuild the widget tree with the new bloc
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      BlocProvider.value(
+                    value: newBloc,
+                    child: LearningSessionPage(plan: widget.plan),
+                  ),
+                  transitionDuration: Duration.zero,
+                ),
+              );
+            },
             child: const Text('继续学习'),
           ),
           TextButton(
@@ -481,45 +695,6 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
     spots.add(FlSpot(totalMinutes.toDouble(), totalCharacters.toDouble()));
 
     return spots;
-  }
-
-  bool _onSwipe(
-    int previousIndex,
-    int? currentIndex,
-    CardSwiperDirection direction,
-  ) {
-    if (currentIndex != null) {
-      setState(() {
-        this.currentIndex = currentIndex;
-      });
-      final state = context.read<LearningSessionBloc>().state;
-      context.read<LearningSessionBloc>().add(
-            LearningSessionEvent.characterLearned(
-              character: state.characters[previousIndex],
-              isKnown: direction == CardSwiperDirection.right,
-            ),
-          );
-    }
-    return true;
-  }
-
-  bool _onUndo(
-    int? previousIndex,
-    int currentIndex,
-    CardSwiperDirection direction,
-  ) {
-    setState(() {
-      this.currentIndex = currentIndex;
-    });
-    if (previousIndex != null) {
-      final state = context.read<LearningSessionBloc>().state;
-      context.read<LearningSessionBloc>().add(
-            LearningSessionEvent.characterUndone(
-              character: state.characters[previousIndex],
-            ),
-          );
-    }
-    return true;
   }
 
   Future<void> _showHintDialog(BuildContext context, String character) {

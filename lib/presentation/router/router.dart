@@ -62,9 +62,14 @@ final router = GoRouter(
             }
 
             final plan = snapshot.data;
+            if (plan == null) {
+              return Scaffold(
+                body: Center(child: Text('未找到学习计划')),
+              );
+            }
+
             return BlocProvider(
-              create: (context) => getIt<LearningPlanBloc>()
-                ..add(const LearningPlanEvent.started()),
+              create: (context) => getIt<LearningPlanBloc>(),
               child: LearningPlanPage(initialPlan: plan),
             );
           },

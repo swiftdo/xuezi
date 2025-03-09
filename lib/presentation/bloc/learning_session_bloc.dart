@@ -37,6 +37,7 @@ class LearningSessionBloc
     on<_CharacterLearned>(_onCharacterLearned);
     on<_CharacterUndone>(_onCharacterUndone);
     on<_EndSession>(_onEndSession);
+    on<_Restart>(_onRestart);
   }
 
   static List<String> _getCharactersForPlan(LearningPlan plan) {
@@ -83,35 +84,65 @@ class LearningSessionBloc
 
   void _onCharacterLearned(
       _CharacterLearned event, Emitter<LearningSessionState> emit) {
-    final knownCharacters = List<String>.from(state.knownCharacters);
-    final unknownCharacters = List<String>.from(state.unknownCharacters);
+    // Create new lists to ensure immutability
+    final List<String> newKnownCharacters = [...state.knownCharacters];
+    final List<String> newUnknownCharacters = [...state.unknownCharacters];
 
+    // Remove the character from both lists first to avoid duplicates
+    newKnownCharacters.remove(event.character);
+    newUnknownCharacters.remove(event.character);
+
+    // Add to appropriate list based on isKnown flag
     if (event.isKnown) {
-      knownCharacters.add(event.character);
+      newKnownCharacters.add(event.character);
     } else {
-      unknownCharacters.add(event.character);
+      newUnknownCharacters.add(event.character);
     }
 
-    emit(state.copyWith(
-      charactersLearned: state.charactersLearned + 1,
-      knownCharacters: knownCharacters,
-      unknownCharacters: unknownCharacters,
-    ));
+    // Create a completely new state object
+    final newState = LearningSessionState(
+      plan: state.plan,
+      startTime: state.startTime,
+      totalStudyTime: state.totalStudyTime,
+      charactersLearned:
+          newKnownCharacters.length + newUnknownCharacters.length,
+      isActive: state.isActive,
+      completedExercises: [...state.completedExercises],
+      knownCharacters: newKnownCharacters,
+      unknownCharacters: newUnknownCharacters,
+      characters: [...state.characters],
+      lastResumeTime: state.lastResumeTime,
+    );
+
+    emit(newState);
   }
 
   void _onCharacterUndone(
       _CharacterUndone event, Emitter<LearningSessionState> emit) {
-    final knownCharacters = List<String>.from(state.knownCharacters);
-    final unknownCharacters = List<String>.from(state.unknownCharacters);
+    // Create new lists to ensure immutability
+    final List<String> newKnownCharacters = [...state.knownCharacters];
+    final List<String> newUnknownCharacters = [...state.unknownCharacters];
 
-    knownCharacters.remove(event.character);
-    unknownCharacters.remove(event.character);
+    // Remove the character from both lists
+    newKnownCharacters.remove(event.character);
+    newUnknownCharacters.remove(event.character);
 
-    emit(state.copyWith(
-      charactersLearned: state.charactersLearned - 1,
-      knownCharacters: knownCharacters,
-      unknownCharacters: unknownCharacters,
-    ));
+    // Create a completely new state object
+    final newState = LearningSessionState(
+      plan: state.plan,
+      startTime: state.startTime,
+      totalStudyTime: state.totalStudyTime,
+      charactersLearned:
+          newKnownCharacters.length + newUnknownCharacters.length,
+      isActive: state.isActive,
+      completedExercises: [...state.completedExercises],
+      knownCharacters: newKnownCharacters,
+      unknownCharacters: newUnknownCharacters,
+      characters: [...state.characters],
+      lastResumeTime: state.lastResumeTime,
+    );
+
+    emit(newState);
   }
 
   Future<void> _onEndSession(
@@ -139,6 +170,21 @@ class LearningSessionBloc
       isActive: false,
       totalStudyTime: totalTime,
       lastResumeTime: null,
+    ));
+  }
+
+  void _onRestart(_Restart event, Emitter<LearningSessionState> emit) {
+    emit(LearningSessionState(
+      plan: plan,
+      startTime: DateTime.now(),
+      lastResumeTime: DateTime.now(),
+      totalStudyTime: Duration.zero,
+      charactersLearned: 0,
+      isActive: true,
+      completedExercises: [],
+      knownCharacters: [],
+      unknownCharacters: [],
+      characters: _characters,
     ));
   }
 }
