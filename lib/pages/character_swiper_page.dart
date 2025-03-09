@@ -5,11 +5,13 @@ import 'package:flutter_tts/flutter_tts.dart';
 class CharacterSwiperPage extends StatefulWidget {
   final List<String> characters;
   final FlutterTts flutterTts;
+  final Function(String) onCharacterLearned; // 新增回调函数
 
   const CharacterSwiperPage({
     super.key,
     required this.characters,
     required this.flutterTts,
+    required this.onCharacterLearned, // 添加到构造函数
   });
 
   @override
@@ -21,6 +23,7 @@ class _CharacterSwiperPageState extends State<CharacterSwiperPage> {
 
   Future<void> _speak(String text) async {
     await widget.flutterTts.setLanguage('zh-CN');
+    await widget.flutterTts.awaitSpeakCompletion(true);
     await widget.flutterTts.speak(text);
   }
 
@@ -34,6 +37,8 @@ class _CharacterSwiperPageState extends State<CharacterSwiperPage> {
         cardsCount: widget.characters.length,
         onSwipe: (previousIndex, currentIndex, direction) {
           this.currentIndex = currentIndex ?? 0;
+          // 当卡片滑动时，调用回调函数记录已读汉字
+          widget.onCharacterLearned(widget.characters[this.currentIndex]);
           return true;
         },
         cardBuilder: (context, index, horizontalOffsetPercentage,

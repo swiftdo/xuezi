@@ -1,98 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:objectbox/objectbox.dart';
+import 'package:xuezi/models/learned_character.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+import '../objectbox.dart';
+
+class HomePage extends StatefulWidget {
+  final List<String> shuffledCharacters;
+  final List<String> firstShuffledCharacters;
+  final FlutterTts flutterTts;
+
+  const HomePage({
+    super.key,
+    required this.shuffledCharacters,
+    required this.firstShuffledCharacters,
+    required this.flutterTts,
+  });
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final FlutterTts flutterTts = FlutterTts();
-  final List<String> characters1To10 = [
-    '一',
-    '二',
-    '三',
-    '四',
-    '五',
-    '六',
-    '七',
-    '八',
-    '九',
-    '十'
-  ];
+class _HomePageState extends State<HomePage> {
+  List<String> learnedCharacters = [];
+  late Box<LearnedCharacter> learnedCharacterBox;
 
-  final List<String> firstCharacters = [
-    "天",
-    "地",
-    "人",
-    "你",
-    "我",
-    "他",
-    "一",
-    "二",
-    "三",
-    "四",
-    "五",
-    "上",
-    "下",
-    "口",
-    "耳",
-    "目",
-    "手",
-    "足",
-    "站",
-    "坐",
-    "日",
-    "月",
-    "水",
-    "火",
-    "山",
-    "石",
-    "田",
-    "禾",
-    "对",
-    "云",
-    "雨",
-    "风",
-    "花",
-    "鸟",
-    "虫",
-    "六",
-    "七",
-    "八",
-    "九",
-    "十",
-    "爸",
-    "妈",
-    "马",
-    "土",
-    "不",
-    "画",
-    "打",
-    "棋",
-    "鸡",
-    "字",
-    "词",
-    "语",
-    "句",
-    "桌",
-    "纸",
-    "妹",
-    "奶",
-    "小",
-    "桥",
-  ];
+  @override
+  void initState() {
+    super.initState();
+    learnedCharacterBox = store.box<LearnedCharacter>();
+    _loadLearnedCharacters();
+  }
+
+  void _loadLearnedCharacters() {
+    final characters = learnedCharacterBox.getAll();
+    setState(() {
+      learnedCharacters = characters.map((c) => c.character).toList();
+    });
+  }
+
+  void _saveLearnedCharacter(String character) {
+    if (!learnedCharacters.contains(character)) {
+      final newCharacter = LearnedCharacter(character: character);
+      learnedCharacterBox.put(newCharacter);
+      setState(() {
+        learnedCharacters.add(character);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> shuffledCharacters = List<String>.from(characters1To10)
-      ..shuffle();
-
-    List<String> firstShuffledCharacters = firstCharacters..shuffle();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('学习列表'),
@@ -110,13 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               onTap: () {
                 context.push('/character-swiper', extra: {
-                  'characters': shuffledCharacters,
-                  'flutterTts': flutterTts,
+                  'characters': widget.shuffledCharacters,
+                  'flutterTts': widget.flutterTts,
+                  'onCharacterLearned': _saveLearnedCharacter,
                 });
-                // context.go('/character-swiper', extra: {
-                //   'characters': shuffledCharacters,
-                //   'flutterTts': flutterTts,
-                // });
               },
             ),
           ),
@@ -131,13 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               onTap: () {
                 context.push('/character-swiper', extra: {
-                  'characters': firstShuffledCharacters,
-                  'flutterTts': flutterTts,
+                  'characters': widget.firstShuffledCharacters,
+                  'flutterTts': widget.flutterTts,
+                  'onCharacterLearned': _saveLearnedCharacter,
                 });
-                // context.go('/character-swiper', extra: {
-                //   'characters': shuffledCharacters,
-                //   'flutterTts': flutterTts,
-                // });
               },
             ),
           ),

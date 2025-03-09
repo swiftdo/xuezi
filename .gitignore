@@ -32,6 +32,27 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+# 新增 Flutter 相关忽略规则
+.idea/ # 通常 IDE 配置文件
+.vscode/ # VS Code 配置文件
+.gradle/ # Gradle 缓存目录
+/cache/ # 通用缓存目录
+/coverage/ # 代码覆盖率报告
+/lcov/ # 代码覆盖率相关
+/ios/Flutter/App.framework/ # iOS Flutter 框架文件
+/ios/Flutter/Flutter.framework/ # iOS Flutter 框架文件
+/ios/Flutter/Flutter.podspec # iOS Flutter Podspec 文件
+/ios/Runner/GeneratedPluginRegistrant.* # iOS 生成的插件注册文件
+/android/app/.cxx/ # Android NDK 编译产物
+/android/app/build/ # Android 应用构建产物
+/android/build/ # Android 项目构建产物
+/android/gradle/ # Android Gradle 配置
+/android/gradle-wrapper.jar # Android Gradle 包装器
+/android/gradlew # Android Gradle 包装器脚本
+/android/gradlew.bat # Windows 下的 Android Gradle 包装器脚本
+/android/local.properties # Android 本地属性文件
+/android/.idea/ # Android Studio 配置文件
+/android/.gradle/ # Android Gradle 缓存
 
 # Symbolication related
 app.*.symbols
@@ -43,3 +64,17 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android 编译文件
+/android/app/build/
+/android/build/
+/android/.gradle/
+/android/local.properties
+/android/app/.cxx/  # 新增忽略 .cxx 目录
+
+# iOS 编译文件
+/ios/build/
+/ios/DerivedData/
+/ios/Pods/
+/ios/.symlinks/
+/ios/Podfile.lock
