@@ -1,127 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:xuezi/domain/entities/learned_character.dart';
-import 'package:xuezi/infrastructure/database/objectbox/objectbox.dart';
+import 'package:go_router/go_router.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final FlutterTts flutterTts = FlutterTts();
-  final CardSwiperController controller = CardSwiperController();
-  final List<String> characters = ['你', '好', '世', '界'];
-  int currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    flutterTts.setLanguage("zh-CN");
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('学习'),
+        title: const Text('学习列表'),
       ),
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
         children: [
-          Expanded(
-            child: CardSwiper(
-              controller: controller,
-              cardsCount: characters.length,
-              onSwipe: _onSwipe,
-              onUndo: _onUndo,
-              numberOfCardsDisplayed: 3,
-              backCardOffset: const Offset(40, 40),
-              padding: const EdgeInsets.all(24.0),
-              cardBuilder: (context, index, _, __) {
-                return GestureDetector(
-                  onTap: () {
-                    flutterTts.speak(characters[index]);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withAlpha(51),
-                          spreadRadius: 3,
-                          blurRadius: 7,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        characters[index],
-                        style: const TextStyle(fontSize: 80),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+          _buildCharacterSetCard(
+            context,
+            title: '1 - 10 汉字',
+            characters: ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'],
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                FloatingActionButton(
-                  onPressed: () {
-                    controller.undo();
-                  },
-                  child: const Icon(Icons.undo),
-                ),
-                FloatingActionButton(
-                  onPressed: () {
-                    flutterTts.speak(characters[currentIndex]);
-                  },
-                  child: const Icon(Icons.volume_up),
-                ),
-              ],
-            ),
+          const SizedBox(height: 16),
+          _buildCharacterSetCard(
+            context,
+            title: '常用问候语',
+            characters: ['你', '好', '早', '晚', '再', '见'],
+          ),
+          const SizedBox(height: 16),
+          _buildCharacterSetCard(
+            context,
+            title: '基础词汇',
+            characters: ['我', '你', '他', '她', '它', '们'],
           ),
         ],
       ),
     );
   }
 
-  bool _onSwipe(
-    int previousIndex,
-    int? currentIndex,
-    CardSwiperDirection direction,
-  ) {
-    if (currentIndex != null) {
-      this.currentIndex = currentIndex;
-    }
-    final character = characters[previousIndex];
-    if (direction == CardSwiperDirection.right) {
-      final learnedChar = LearnedCharacter(character: character);
-      store.box<LearnedCharacter>().put(learnedChar);
-    }
-    return true;
-  }
-
-  bool _onUndo(
-    int? previousIndex,
-    int currentIndex,
-    CardSwiperDirection direction,
-  ) {
-    this.currentIndex = currentIndex;
-    return true;
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
+  Widget _buildCharacterSetCard(
+    BuildContext context, {
+    required String title,
+    required List<String> characters,
+  }) {
+    return Card(
+      child: ListTile(
+        title: Text(title),
+        subtitle: Text('包含 ${characters.length} 个汉字'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () {
+          context.push('/detail', extra: {
+            'title': title,
+            'characters': characters,
+          });
+        },
+      ),
+    );
   }
 }
