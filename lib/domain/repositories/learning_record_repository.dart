@@ -1,9 +1,10 @@
 import '../entities/learning_record.dart';
+import '../entities/review_character.dart';
 
 abstract class LearningRecordRepository {
   Future<void> saveLearningRecord(LearningRecord record);
-  Future<List<LearningRecord>> getLearningRecords(String planId);
-  Future<List<LearningRecord>> getLearningRecordsByDate(DateTime date);
-  Future<LearningRecord?> getLastLearningRecord(String planId);
-  Future<Map<String, int>> getCharacterMasteryCount(String planId);
+  Future<List<LearningRecord>> getLearningRecords();
+  Future<void> saveReviewCharacter(ReviewCharacter character);
+  Future<List<ReviewCharacter>> getReviewCharactersForToday();
+  Future<void> updateReviewCharacter(ReviewCharacter character);
 }

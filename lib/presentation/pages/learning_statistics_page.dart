@@ -5,63 +5,60 @@ import 'dart:math';
 import '../../domain/entities/learning_record.dart';
 import '../bloc/learning_statistics_bloc.dart';
 import '../theme/app_colors.dart';
+import '../../injection.dart';
 
 class LearningStatisticsPage extends StatelessWidget {
-  const LearningStatisticsPage({super.key});
+  final String planId;
+
+  const LearningStatisticsPage({super.key, required this.planId});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LearningStatisticsBloc, LearningStatisticsState>(
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('学习统计'),
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-          ),
-          body: state.when(
-            initial: () => const Center(child: CircularProgressIndicator()),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (message) => Center(child: Text('错误：$message')),
-            loaded: (records, masteryCount) => SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSummaryCards(records),
-                  const SizedBox(height: 24),
-                  _buildLearningTrendChart(records),
-                  const SizedBox(height: 24),
-                  _buildMasteryDistribution(masteryCount),
-                  const SizedBox(height: 24),
-                  _buildRecentRecords(records),
-                  const SizedBox(height: 16),
-                ],
+    return BlocProvider(
+      create: (context) => getIt<LearningStatisticsBloc>()
+        ..add(LearningStatisticsEvent.started(planId)),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('学习统计'),
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+        ),
+        body: BlocBuilder<LearningStatisticsBloc, LearningStatisticsState>(
+          builder: (context, state) {
+            return state.when(
+              initial: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (message) => Center(child: Text('错误：$message')),
+              loaded: (totalStudyTime, characterMasteryCounts) =>
+                  SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSummaryCards(totalStudyTime, characterMasteryCounts),
+                    const SizedBox(height: 24),
+                    _buildMasteryDistribution(characterMasteryCounts),
+                  ],
+                ),
               ),
-            ),
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 
-  Widget _buildSummaryCards(List<LearningRecord> records) {
-    final totalTime = records.fold<Duration>(
-      Duration.zero,
-      (sum, record) => sum + record.totalStudyTime,
-    );
+  Widget _buildSummaryCards(
+      Duration totalStudyTime, Map<String, int> characterMasteryCounts) {
+    final totalCharacters = characterMasteryCounts.length;
+    final masteredCharacters =
+        characterMasteryCounts.values.where((count) => count >= 2).length;
+    final needReviewCharacters =
+        characterMasteryCounts.values.where((count) => count <= 0).length;
 
-    final totalKnownCharacters =
-        records.expand((record) => record.knownCharacters).toSet().length;
-
-    final totalUnknownCharacters =
-        records.expand((record) => record.unknownCharacters).toSet().length;
-
-    final averageTimePerCharacter = records.isEmpty
+    final averageTimePerCharacter = totalCharacters == 0
         ? Duration.zero
-        : Duration(
-            minutes: totalTime.inMinutes ~/
-                (totalKnownCharacters + totalUnknownCharacters));
+        : Duration(minutes: totalStudyTime.inMinutes ~/ totalCharacters);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -76,19 +73,20 @@ class LearningStatisticsPage extends StatelessWidget {
           children: [
             _buildSummaryCard(
               title: '总学习时间',
-              value: '${totalTime.inHours}小时${totalTime.inMinutes % 60}分钟',
+              value:
+                  '${totalStudyTime.inHours}小时${totalStudyTime.inMinutes % 60}分钟',
               icon: Icons.timer,
               color: AppColors.primary,
             ),
             _buildSummaryCard(
               title: '已掌握汉字',
-              value: '$totalKnownCharacters个',
+              value: '$masteredCharacters个',
               icon: Icons.check_circle,
               color: AppColors.accent,
             ),
             _buildSummaryCard(
               title: '需要复习',
-              value: '$totalUnknownCharacters个',
+              value: '$needReviewCharacters个',
               icon: Icons.refresh,
               color: AppColors.warning,
             ),
@@ -141,235 +139,12 @@ class LearningStatisticsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLearningTrendChart(List<LearningRecord> records) {
-    if (records.isEmpty) {
-      return const SizedBox();
-    }
-
-    final dailyStats = _calculateDailyStats(records);
-    final sortedDates = dailyStats.keys.toList()..sort();
-
-    if (sortedDates.isEmpty) {
-      return const SizedBox();
-    }
-
-    final maxCharacters = dailyStats.values
-        .map((stats) => stats.charactersLearned)
-        .reduce(max)
-        .toDouble();
-    final maxTime = dailyStats.values
-        .map((stats) => stats.totalTime.inMinutes)
-        .reduce(max)
-        .toDouble();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '学习趋势',
-          style: TextStyle(
-            color: AppColors.neutral1,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 300,
-          child: LineChart(
-            LineChartData(
-              gridData: FlGridData(
-                show: true,
-                drawVerticalLine: true,
-                horizontalInterval: maxCharacters / 5,
-                getDrawingHorizontalLine: (value) => FlLine(
-                  color: AppColors.neutral4,
-                  strokeWidth: 1,
-                ),
-                getDrawingVerticalLine: (value) => FlLine(
-                  color: AppColors.neutral4,
-                  strokeWidth: 1,
-                ),
-              ),
-              titlesData: FlTitlesData(
-                show: true,
-                rightTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                topTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      if (value.toInt() >= sortedDates.length) {
-                        return const SizedBox();
-                      }
-                      final date = sortedDates[value.toInt()];
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          '${date.month}/${date.day}',
-                          style: TextStyle(
-                            color: AppColors.neutral2,
-                            fontSize: 12,
-                          ),
-                        ),
-                      );
-                    },
-                    reservedSize: 30,
-                  ),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      return Text(
-                        value.toInt().toString(),
-                        style: TextStyle(
-                          color: AppColors.neutral2,
-                          fontSize: 12,
-                        ),
-                      );
-                    },
-                    reservedSize: 40,
-                  ),
-                ),
-              ),
-              borderData: FlBorderData(
-                show: true,
-                border: Border.all(color: AppColors.neutral4),
-              ),
-              minX: 0,
-              maxX: (sortedDates.length - 1).toDouble(),
-              minY: 0,
-              maxY: maxCharacters + (maxCharacters * 0.1),
-              lineBarsData: [
-                // 学习汉字数量曲线
-                LineChartBarData(
-                  spots: List.generate(sortedDates.length, (index) {
-                    final date = sortedDates[index];
-                    final stats = dailyStats[date]!;
-                    return FlSpot(
-                      index.toDouble(),
-                      stats.charactersLearned.toDouble(),
-                    );
-                  }),
-                  isCurved: true,
-                  color: AppColors.primary,
-                  barWidth: 3,
-                  isStrokeCapRound: true,
-                  dotData: FlDotData(
-                    show: true,
-                    getDotPainter: (spot, percent, bar, index) {
-                      return FlDotCirclePainter(
-                        radius: 4,
-                        color: AppColors.primary,
-                        strokeWidth: 2,
-                        strokeColor: Colors.white,
-                      );
-                    },
-                  ),
-                  belowBarData: BarAreaData(
-                    show: true,
-                    color: AppColors.primary.withOpacity(0.1),
-                  ),
-                ),
-                // 学习时间曲线（分钟）
-                LineChartBarData(
-                  spots: List.generate(sortedDates.length, (index) {
-                    final date = sortedDates[index];
-                    final stats = dailyStats[date]!;
-                    return FlSpot(
-                      index.toDouble(),
-                      (stats.totalTime.inMinutes.toDouble() *
-                          maxCharacters /
-                          maxTime),
-                    );
-                  }),
-                  isCurved: true,
-                  color: AppColors.accent,
-                  barWidth: 3,
-                  isStrokeCapRound: true,
-                  dotData: FlDotData(
-                    show: true,
-                    getDotPainter: (spot, percent, bar, index) {
-                      return FlDotCirclePainter(
-                        radius: 4,
-                        color: AppColors.accent,
-                        strokeWidth: 2,
-                        strokeColor: Colors.white,
-                      );
-                    },
-                  ),
-                ),
-              ],
-              extraLinesData: ExtraLinesData(
-                horizontalLines: [
-                  HorizontalLine(
-                    y: records.first.targetCharactersPerDay.toDouble(),
-                    color: AppColors.warning.withOpacity(0.5),
-                    strokeWidth: 2,
-                    dashArray: [5, 5],
-                    label: HorizontalLineLabel(
-                      show: true,
-                      alignment: Alignment.topRight,
-                      padding: const EdgeInsets.only(right: 8, bottom: 4),
-                      style: TextStyle(
-                        color: AppColors.warning,
-                        fontSize: 12,
-                      ),
-                      labelResolver: (line) => '目标: ${line.y.toInt()}字/天',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildChartLegend(AppColors.primary, '学习汉字数'),
-            const SizedBox(width: 24),
-            _buildChartLegend(AppColors.accent, '学习时间'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChartLegend(Color color, String label) {
-    return Row(
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: AppColors.neutral2,
-            fontSize: 12,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMasteryDistribution(Map<String, int> masteryCount) {
+  Widget _buildMasteryDistribution(Map<String, int> characterMasteryCounts) {
     final categories = {
-      '熟练': masteryCount.values.where((v) => v >= 3).length,
-      '掌握': masteryCount.values.where((v) => v == 2).length,
-      '学习中': masteryCount.values.where((v) => v == 1).length,
-      '需要复习': masteryCount.values.where((v) => v <= 0).length,
+      '熟练': characterMasteryCounts.values.where((v) => v >= 3).length,
+      '掌握': characterMasteryCounts.values.where((v) => v == 2).length,
+      '学习中': characterMasteryCounts.values.where((v) => v == 1).length,
+      '需要复习': characterMasteryCounts.values.where((v) => v <= 0).length,
     };
 
     return ConstrainedBox(
@@ -423,81 +198,4 @@ class LearningStatisticsPage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildRecentRecords(List<LearningRecord> records) {
-    final recentRecords = records.take(5).toList()
-      ..sort((a, b) => b.endTime.compareTo(a.endTime));
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '最近学习记录',
-          style: TextStyle(
-            color: AppColors.neutral1,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ...recentRecords.map((record) => Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                title: Text(
-                  '${record.knownCharacters.length + record.unknownCharacters.length}个汉字',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  '学习时间：${record.totalStudyTime.inMinutes}分钟',
-                ),
-                trailing: Text(
-                  _formatDate(record.endTime),
-                  style: TextStyle(
-                    color: AppColors.neutral2,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            )),
-      ],
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.month}月${date.day}日 ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
-  }
-}
-
-class _DailyStats {
-  final int charactersLearned;
-  final Duration totalTime;
-
-  _DailyStats(this.charactersLearned, this.totalTime);
-}
-
-Map<DateTime, _DailyStats> _calculateDailyStats(List<LearningRecord> records) {
-  final dailyStats = <DateTime, _DailyStats>{};
-
-  for (final record in records) {
-    final date = DateTime(
-      record.startTime.year,
-      record.startTime.month,
-      record.startTime.day,
-    );
-
-    final charactersLearned =
-        record.knownCharacters.length + record.unknownCharacters.length;
-    final existingStats = dailyStats[date];
-
-    if (existingStats == null) {
-      dailyStats[date] = _DailyStats(charactersLearned, record.totalStudyTime);
-    } else {
-      dailyStats[date] = _DailyStats(
-        existingStats.charactersLearned + charactersLearned,
-        existingStats.totalTime + record.totalStudyTime,
-      );
-    }
-  }
-
-  return dailyStats;
 }

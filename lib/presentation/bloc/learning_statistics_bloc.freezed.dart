@@ -16,43 +16,44 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$LearningStatisticsEvent {
+  String get planId => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String planId) started,
-    required TResult Function() refresh,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String planId)? started,
-    TResult? Function()? refresh,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String planId)? started,
-    TResult Function()? refresh,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
-    required TResult Function(_Refresh value) refresh,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
-    TResult? Function(_Refresh value)? refresh,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
-    TResult Function(_Refresh value)? refresh,
     required TResult orElse(),
   }) =>
+      throw _privateConstructorUsedError;
+
+  /// Create a copy of LearningStatisticsEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $LearningStatisticsEventCopyWith<LearningStatisticsEvent> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -61,6 +62,8 @@ abstract class $LearningStatisticsEventCopyWith<$Res> {
   factory $LearningStatisticsEventCopyWith(LearningStatisticsEvent value,
           $Res Function(LearningStatisticsEvent) then) =
       _$LearningStatisticsEventCopyWithImpl<$Res, LearningStatisticsEvent>;
+  @useResult
+  $Res call({String planId});
 }
 
 /// @nodoc
@@ -76,13 +79,27 @@ class _$LearningStatisticsEventCopyWithImpl<$Res,
 
   /// Create a copy of LearningStatisticsEvent
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? planId = null,
+  }) {
+    return _then(_value.copyWith(
+      planId: null == planId
+          ? _value.planId
+          : planId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
 }
 
 /// @nodoc
-abstract class _$$StartedImplCopyWith<$Res> {
+abstract class _$$StartedImplCopyWith<$Res>
+    implements $LearningStatisticsEventCopyWith<$Res> {
   factory _$$StartedImplCopyWith(
           _$StartedImpl value, $Res Function(_$StartedImpl) then) =
       __$$StartedImplCopyWithImpl<$Res>;
+  @override
   @useResult
   $Res call({String planId});
 }
@@ -147,7 +164,6 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String planId) started,
-    required TResult Function() refresh,
   }) {
     return started(planId);
   }
@@ -156,7 +172,6 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String planId)? started,
-    TResult? Function()? refresh,
   }) {
     return started?.call(planId);
   }
@@ -165,7 +180,6 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String planId)? started,
-    TResult Function()? refresh,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -178,7 +192,6 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
-    required TResult Function(_Refresh value) refresh,
   }) {
     return started(this);
   }
@@ -187,7 +200,6 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
-    TResult? Function(_Refresh value)? refresh,
   }) {
     return started?.call(this);
   }
@@ -196,7 +208,6 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
-    TResult Function(_Refresh value)? refresh,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -209,118 +220,15 @@ class _$StartedImpl implements _Started {
 abstract class _Started implements LearningStatisticsEvent {
   const factory _Started(final String planId) = _$StartedImpl;
 
+  @override
   String get planId;
 
   /// Create a copy of LearningStatisticsEvent
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$StartedImplCopyWith<_$StartedImpl> get copyWith =>
       throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$RefreshImplCopyWith<$Res> {
-  factory _$$RefreshImplCopyWith(
-          _$RefreshImpl value, $Res Function(_$RefreshImpl) then) =
-      __$$RefreshImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$RefreshImplCopyWithImpl<$Res>
-    extends _$LearningStatisticsEventCopyWithImpl<$Res, _$RefreshImpl>
-    implements _$$RefreshImplCopyWith<$Res> {
-  __$$RefreshImplCopyWithImpl(
-      _$RefreshImpl _value, $Res Function(_$RefreshImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of LearningStatisticsEvent
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$RefreshImpl implements _Refresh {
-  const _$RefreshImpl();
-
-  @override
-  String toString() {
-    return 'LearningStatisticsEvent.refresh()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$RefreshImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String planId) started,
-    required TResult Function() refresh,
-  }) {
-    return refresh();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String planId)? started,
-    TResult? Function()? refresh,
-  }) {
-    return refresh?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String planId)? started,
-    TResult Function()? refresh,
-    required TResult orElse(),
-  }) {
-    if (refresh != null) {
-      return refresh();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Started value) started,
-    required TResult Function(_Refresh value) refresh,
-  }) {
-    return refresh(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Started value)? started,
-    TResult? Function(_Refresh value)? refresh,
-  }) {
-    return refresh?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Started value)? started,
-    TResult Function(_Refresh value)? refresh,
-    required TResult orElse(),
-  }) {
-    if (refresh != null) {
-      return refresh(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class _Refresh implements LearningStatisticsEvent {
-  const factory _Refresh() = _$RefreshImpl;
 }
 
 /// @nodoc
@@ -331,7 +239,7 @@ mixin _$LearningStatisticsState {
     required TResult Function() loading,
     required TResult Function(String message) error,
     required TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)
         loaded,
   }) =>
       throw _privateConstructorUsedError;
@@ -341,7 +249,7 @@ mixin _$LearningStatisticsState {
     TResult? Function()? loading,
     TResult? Function(String message)? error,
     TResult? Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
   }) =>
       throw _privateConstructorUsedError;
@@ -351,7 +259,7 @@ mixin _$LearningStatisticsState {
     TResult Function()? loading,
     TResult Function(String message)? error,
     TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
     required TResult orElse(),
   }) =>
@@ -450,7 +358,7 @@ class _$InitialImpl implements _Initial {
     required TResult Function() loading,
     required TResult Function(String message) error,
     required TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)
         loaded,
   }) {
     return initial();
@@ -463,7 +371,7 @@ class _$InitialImpl implements _Initial {
     TResult? Function()? loading,
     TResult? Function(String message)? error,
     TResult? Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
   }) {
     return initial?.call();
@@ -476,7 +384,7 @@ class _$InitialImpl implements _Initial {
     TResult Function()? loading,
     TResult Function(String message)? error,
     TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
     required TResult orElse(),
   }) {
@@ -573,7 +481,7 @@ class _$LoadingImpl implements _Loading {
     required TResult Function() loading,
     required TResult Function(String message) error,
     required TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)
         loaded,
   }) {
     return loading();
@@ -586,7 +494,7 @@ class _$LoadingImpl implements _Loading {
     TResult? Function()? loading,
     TResult? Function(String message)? error,
     TResult? Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
   }) {
     return loading?.call();
@@ -599,7 +507,7 @@ class _$LoadingImpl implements _Loading {
     TResult Function()? loading,
     TResult Function(String message)? error,
     TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
     required TResult orElse(),
   }) {
@@ -723,7 +631,7 @@ class _$ErrorImpl implements _Error {
     required TResult Function() loading,
     required TResult Function(String message) error,
     required TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)
         loaded,
   }) {
     return error(message);
@@ -736,7 +644,7 @@ class _$ErrorImpl implements _Error {
     TResult? Function()? loading,
     TResult? Function(String message)? error,
     TResult? Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
   }) {
     return error?.call(message);
@@ -749,7 +657,7 @@ class _$ErrorImpl implements _Error {
     TResult Function()? loading,
     TResult Function(String message)? error,
     TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
     required TResult orElse(),
   }) {
@@ -815,7 +723,7 @@ abstract class _$$LoadedImplCopyWith<$Res> {
           _$LoadedImpl value, $Res Function(_$LoadedImpl) then) =
       __$$LoadedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({List<LearningRecord> records, Map<String, int> masteryCount});
+  $Res call({Duration totalStudyTime, Map<String, int> characterMasteryCounts});
 }
 
 /// @nodoc
@@ -831,17 +739,17 @@ class __$$LoadedImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? records = null,
-    Object? masteryCount = null,
+    Object? totalStudyTime = null,
+    Object? characterMasteryCounts = null,
   }) {
     return _then(_$LoadedImpl(
-      records: null == records
-          ? _value._records
-          : records // ignore: cast_nullable_to_non_nullable
-              as List<LearningRecord>,
-      masteryCount: null == masteryCount
-          ? _value._masteryCount
-          : masteryCount // ignore: cast_nullable_to_non_nullable
+      totalStudyTime: null == totalStudyTime
+          ? _value.totalStudyTime
+          : totalStudyTime // ignore: cast_nullable_to_non_nullable
+              as Duration,
+      characterMasteryCounts: null == characterMasteryCounts
+          ? _value._characterMasteryCounts
+          : characterMasteryCounts // ignore: cast_nullable_to_non_nullable
               as Map<String, int>,
     ));
   }
@@ -851,30 +759,24 @@ class __$$LoadedImplCopyWithImpl<$Res>
 
 class _$LoadedImpl implements _Loaded {
   const _$LoadedImpl(
-      {required final List<LearningRecord> records,
-      required final Map<String, int> masteryCount})
-      : _records = records,
-        _masteryCount = masteryCount;
+      {required this.totalStudyTime,
+      required final Map<String, int> characterMasteryCounts})
+      : _characterMasteryCounts = characterMasteryCounts;
 
-  final List<LearningRecord> _records;
   @override
-  List<LearningRecord> get records {
-    if (_records is EqualUnmodifiableListView) return _records;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_records);
-  }
-
-  final Map<String, int> _masteryCount;
+  final Duration totalStudyTime;
+  final Map<String, int> _characterMasteryCounts;
   @override
-  Map<String, int> get masteryCount {
-    if (_masteryCount is EqualUnmodifiableMapView) return _masteryCount;
+  Map<String, int> get characterMasteryCounts {
+    if (_characterMasteryCounts is EqualUnmodifiableMapView)
+      return _characterMasteryCounts;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_masteryCount);
+    return EqualUnmodifiableMapView(_characterMasteryCounts);
   }
 
   @override
   String toString() {
-    return 'LearningStatisticsState.loaded(records: $records, masteryCount: $masteryCount)';
+    return 'LearningStatisticsState.loaded(totalStudyTime: $totalStudyTime, characterMasteryCounts: $characterMasteryCounts)';
   }
 
   @override
@@ -882,16 +784,15 @@ class _$LoadedImpl implements _Loaded {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$LoadedImpl &&
-            const DeepCollectionEquality().equals(other._records, _records) &&
-            const DeepCollectionEquality()
-                .equals(other._masteryCount, _masteryCount));
+            (identical(other.totalStudyTime, totalStudyTime) ||
+                other.totalStudyTime == totalStudyTime) &&
+            const DeepCollectionEquality().equals(
+                other._characterMasteryCounts, _characterMasteryCounts));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_records),
-      const DeepCollectionEquality().hash(_masteryCount));
+  int get hashCode => Object.hash(runtimeType, totalStudyTime,
+      const DeepCollectionEquality().hash(_characterMasteryCounts));
 
   /// Create a copy of LearningStatisticsState
   /// with the given fields replaced by the non-null parameter values.
@@ -908,10 +809,10 @@ class _$LoadedImpl implements _Loaded {
     required TResult Function() loading,
     required TResult Function(String message) error,
     required TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)
         loaded,
   }) {
-    return loaded(records, masteryCount);
+    return loaded(totalStudyTime, characterMasteryCounts);
   }
 
   @override
@@ -921,10 +822,10 @@ class _$LoadedImpl implements _Loaded {
     TResult? Function()? loading,
     TResult? Function(String message)? error,
     TResult? Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
   }) {
-    return loaded?.call(records, masteryCount);
+    return loaded?.call(totalStudyTime, characterMasteryCounts);
   }
 
   @override
@@ -934,12 +835,12 @@ class _$LoadedImpl implements _Loaded {
     TResult Function()? loading,
     TResult Function(String message)? error,
     TResult Function(
-            List<LearningRecord> records, Map<String, int> masteryCount)?
+            Duration totalStudyTime, Map<String, int> characterMasteryCounts)?
         loaded,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(records, masteryCount);
+      return loaded(totalStudyTime, characterMasteryCounts);
     }
     return orElse();
   }
@@ -984,11 +885,11 @@ class _$LoadedImpl implements _Loaded {
 
 abstract class _Loaded implements LearningStatisticsState {
   const factory _Loaded(
-      {required final List<LearningRecord> records,
-      required final Map<String, int> masteryCount}) = _$LoadedImpl;
+      {required final Duration totalStudyTime,
+      required final Map<String, int> characterMasteryCounts}) = _$LoadedImpl;
 
-  List<LearningRecord> get records;
-  Map<String, int> get masteryCount;
+  Duration get totalStudyTime;
+  Map<String, int> get characterMasteryCounts;
 
   /// Create a copy of LearningStatisticsState
   /// with the given fields replaced by the non-null parameter values.

@@ -237,3 +237,6 @@ Future<Either<Failure, List<LearnedCharacter>>> getLearnedCharacters();
 3. **BLoC 模式**：状态管理
 4. **工厂模式**：创建对象
 5. **策略模式**：数据源实现
+
+
+我们将功能分 4大模块，学习新知识、复习已经学过的知识、测验、然后统计分析。

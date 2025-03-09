@@ -90,19 +90,6 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
                       }
                       return true;
                     },
-                    onUndo: (previousIndex, currentIndex, direction) {
-                      setState(() {
-                        this.currentIndex = currentIndex;
-                      });
-                      if (previousIndex != null) {
-                        context.read<LearningSessionBloc>().add(
-                              LearningSessionEvent.characterUndone(
-                                character: state.characters[previousIndex],
-                              ),
-                            );
-                      }
-                      return true;
-                    },
                     isLoop: false,
                     numberOfCardsDisplayed: 3,
                     backCardOffset: const Offset(40, 40),
@@ -429,14 +416,6 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           FloatingActionButton(
-            heroTag: 'undo',
-            onPressed: () {
-              controller.undo();
-            },
-            backgroundColor: AppColors.neutral3,
-            child: const Icon(Icons.undo),
-          ),
-          FloatingActionButton(
             heroTag: 'speak',
             onPressed: () {
               if (currentIndex < state.characters.length) {
@@ -514,7 +493,7 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
       await _showSummaryDialog(context, state);
       if (!mounted) return;
 
-      context.go('/plans');
+      context.go('/');
     }
   }
 

@@ -12,6 +12,8 @@ import 'infrastructure/repositories/learning_record_repository_impl.dart';
 import 'presentation/bloc/learning_plan_bloc.dart';
 import 'presentation/bloc/learning_session_bloc.dart';
 import 'domain/entities/learning_plan.dart';
+import 'presentation/bloc/learning_statistics_bloc.dart';
+import 'presentation/bloc/review_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -50,4 +52,7 @@ Future<void> initDependencies() async {
   getIt.registerFactoryParam<LearningSessionBloc, LearningPlan, void>(
     (plan, _) => LearningSessionBloc(plan, getIt<LearningRecordRepository>()),
   );
+
+  getIt.registerFactory(() => LearningStatisticsBloc(getIt()));
+  getIt.registerFactory(() => ReviewBloc(getIt<LearningRecordRepository>()));
 }

@@ -22,7 +22,6 @@ mixin _$LearningSessionEvent {
     required TResult Function() paused,
     required TResult Function() resumed,
     required TResult Function(String character, bool isKnown) characterLearned,
-    required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
     required TResult Function() restart,
   }) =>
@@ -33,7 +32,6 @@ mixin _$LearningSessionEvent {
     TResult? Function()? paused,
     TResult? Function()? resumed,
     TResult? Function(String character, bool isKnown)? characterLearned,
-    TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
     TResult? Function()? restart,
   }) =>
@@ -44,7 +42,6 @@ mixin _$LearningSessionEvent {
     TResult Function()? paused,
     TResult Function()? resumed,
     TResult Function(String character, bool isKnown)? characterLearned,
-    TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
     TResult Function()? restart,
     required TResult orElse(),
@@ -56,7 +53,6 @@ mixin _$LearningSessionEvent {
     required TResult Function(_Paused value) paused,
     required TResult Function(_Resumed value) resumed,
     required TResult Function(_CharacterLearned value) characterLearned,
-    required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
     required TResult Function(_Restart value) restart,
   }) =>
@@ -67,7 +63,6 @@ mixin _$LearningSessionEvent {
     TResult? Function(_Paused value)? paused,
     TResult? Function(_Resumed value)? resumed,
     TResult? Function(_CharacterLearned value)? characterLearned,
-    TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
     TResult? Function(_Restart value)? restart,
   }) =>
@@ -78,7 +73,6 @@ mixin _$LearningSessionEvent {
     TResult Function(_Paused value)? paused,
     TResult Function(_Resumed value)? resumed,
     TResult Function(_CharacterLearned value)? characterLearned,
-    TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
     TResult Function(_Restart value)? restart,
     required TResult orElse(),
@@ -153,7 +147,6 @@ class _$StartedImpl implements _Started {
     required TResult Function() paused,
     required TResult Function() resumed,
     required TResult Function(String character, bool isKnown) characterLearned,
-    required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
     required TResult Function() restart,
   }) {
@@ -167,7 +160,6 @@ class _$StartedImpl implements _Started {
     TResult? Function()? paused,
     TResult? Function()? resumed,
     TResult? Function(String character, bool isKnown)? characterLearned,
-    TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
     TResult? Function()? restart,
   }) {
@@ -181,7 +173,6 @@ class _$StartedImpl implements _Started {
     TResult Function()? paused,
     TResult Function()? resumed,
     TResult Function(String character, bool isKnown)? characterLearned,
-    TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
     TResult Function()? restart,
     required TResult orElse(),
@@ -199,7 +190,6 @@ class _$StartedImpl implements _Started {
     required TResult Function(_Paused value) paused,
     required TResult Function(_Resumed value) resumed,
     required TResult Function(_CharacterLearned value) characterLearned,
-    required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
     required TResult Function(_Restart value) restart,
   }) {
@@ -213,7 +203,6 @@ class _$StartedImpl implements _Started {
     TResult? Function(_Paused value)? paused,
     TResult? Function(_Resumed value)? resumed,
     TResult? Function(_CharacterLearned value)? characterLearned,
-    TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
     TResult? Function(_Restart value)? restart,
   }) {
@@ -227,7 +216,6 @@ class _$StartedImpl implements _Started {
     TResult Function(_Paused value)? paused,
     TResult Function(_Resumed value)? resumed,
     TResult Function(_CharacterLearned value)? characterLearned,
-    TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
     TResult Function(_Restart value)? restart,
     required TResult orElse(),
@@ -288,7 +276,6 @@ class _$PausedImpl implements _Paused {
     required TResult Function() paused,
     required TResult Function() resumed,
     required TResult Function(String character, bool isKnown) characterLearned,
-    required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
     required TResult Function() restart,
   }) {
@@ -302,7 +289,6 @@ class _$PausedImpl implements _Paused {
     TResult? Function()? paused,
     TResult? Function()? resumed,
     TResult? Function(String character, bool isKnown)? characterLearned,
-    TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
     TResult? Function()? restart,
   }) {
@@ -316,7 +302,6 @@ class _$PausedImpl implements _Paused {
     TResult Function()? paused,
     TResult Function()? resumed,
     TResult Function(String character, bool isKnown)? characterLearned,
-    TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
     TResult Function()? restart,
     required TResult orElse(),
@@ -334,7 +319,6 @@ class _$PausedImpl implements _Paused {
     required TResult Function(_Paused value) paused,
     required TResult Function(_Resumed value) resumed,
     required TResult Function(_CharacterLearned value) characterLearned,
-    required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
     required TResult Function(_Restart value) restart,
   }) {
@@ -348,7 +332,6 @@ class _$PausedImpl implements _Paused {
     TResult? Function(_Paused value)? paused,
     TResult? Function(_Resumed value)? resumed,
     TResult? Function(_CharacterLearned value)? characterLearned,
-    TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
     TResult? Function(_Restart value)? restart,
   }) {
@@ -362,7 +345,6 @@ class _$PausedImpl implements _Paused {
     TResult Function(_Paused value)? paused,
     TResult Function(_Resumed value)? resumed,
     TResult Function(_CharacterLearned value)? characterLearned,
-    TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
     TResult Function(_Restart value)? restart,
     required TResult orElse(),
@@ -423,7 +405,6 @@ class _$ResumedImpl implements _Resumed {
     required TResult Function() paused,
     required TResult Function() resumed,
     required TResult Function(String character, bool isKnown) characterLearned,
-    required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
     required TResult Function() restart,
   }) {
@@ -437,7 +418,6 @@ class _$ResumedImpl implements _Resumed {
     TResult? Function()? paused,
     TResult? Function()? resumed,
     TResult? Function(String character, bool isKnown)? characterLearned,
-    TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
     TResult? Function()? restart,
   }) {
@@ -451,7 +431,6 @@ class _$ResumedImpl implements _Resumed {
     TResult Function()? paused,
     TResult Function()? resumed,
     TResult Function(String character, bool isKnown)? characterLearned,
-    TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
     TResult Function()? restart,
     required TResult orElse(),
@@ -469,7 +448,6 @@ class _$ResumedImpl implements _Resumed {
     required TResult Function(_Paused value) paused,
     required TResult Function(_Resumed value) resumed,
     required TResult Function(_CharacterLearned value) characterLearned,
-    required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
     required TResult Function(_Restart value) restart,
   }) {
@@ -483,7 +461,6 @@ class _$ResumedImpl implements _Resumed {
     TResult? Function(_Paused value)? paused,
     TResult? Function(_Resumed value)? resumed,
     TResult? Function(_CharacterLearned value)? characterLearned,
-    TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
     TResult? Function(_Restart value)? restart,
   }) {
@@ -497,7 +474,6 @@ class _$ResumedImpl implements _Resumed {
     TResult Function(_Paused value)? paused,
     TResult Function(_Resumed value)? resumed,
     TResult Function(_CharacterLearned value)? characterLearned,
-    TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
     TResult Function(_Restart value)? restart,
     required TResult orElse(),
@@ -596,7 +572,6 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     required TResult Function() paused,
     required TResult Function() resumed,
     required TResult Function(String character, bool isKnown) characterLearned,
-    required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
     required TResult Function() restart,
   }) {
@@ -610,7 +585,6 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     TResult? Function()? paused,
     TResult? Function()? resumed,
     TResult? Function(String character, bool isKnown)? characterLearned,
-    TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
     TResult? Function()? restart,
   }) {
@@ -624,7 +598,6 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     TResult Function()? paused,
     TResult Function()? resumed,
     TResult Function(String character, bool isKnown)? characterLearned,
-    TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
     TResult Function()? restart,
     required TResult orElse(),
@@ -642,7 +615,6 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     required TResult Function(_Paused value) paused,
     required TResult Function(_Resumed value) resumed,
     required TResult Function(_CharacterLearned value) characterLearned,
-    required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
     required TResult Function(_Restart value) restart,
   }) {
@@ -656,7 +628,6 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     TResult? Function(_Paused value)? paused,
     TResult? Function(_Resumed value)? resumed,
     TResult? Function(_CharacterLearned value)? characterLearned,
-    TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
     TResult? Function(_Restart value)? restart,
   }) {
@@ -670,7 +641,6 @@ class _$CharacterLearnedImpl implements _CharacterLearned {
     TResult Function(_Paused value)? paused,
     TResult Function(_Resumed value)? resumed,
     TResult Function(_CharacterLearned value)? characterLearned,
-    TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
     TResult Function(_Restart value)? restart,
     required TResult orElse(),
@@ -694,179 +664,6 @@ abstract class _CharacterLearned implements LearningSessionEvent {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CharacterLearnedImplCopyWith<_$CharacterLearnedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$CharacterUndoneImplCopyWith<$Res> {
-  factory _$$CharacterUndoneImplCopyWith(_$CharacterUndoneImpl value,
-          $Res Function(_$CharacterUndoneImpl) then) =
-      __$$CharacterUndoneImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String character});
-}
-
-/// @nodoc
-class __$$CharacterUndoneImplCopyWithImpl<$Res>
-    extends _$LearningSessionEventCopyWithImpl<$Res, _$CharacterUndoneImpl>
-    implements _$$CharacterUndoneImplCopyWith<$Res> {
-  __$$CharacterUndoneImplCopyWithImpl(
-      _$CharacterUndoneImpl _value, $Res Function(_$CharacterUndoneImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of LearningSessionEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? character = null,
-  }) {
-    return _then(_$CharacterUndoneImpl(
-      character: null == character
-          ? _value.character
-          : character // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$CharacterUndoneImpl implements _CharacterUndone {
-  const _$CharacterUndoneImpl({required this.character});
-
-  @override
-  final String character;
-
-  @override
-  String toString() {
-    return 'LearningSessionEvent.characterUndone(character: $character)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CharacterUndoneImpl &&
-            (identical(other.character, character) ||
-                other.character == character));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, character);
-
-  /// Create a copy of LearningSessionEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CharacterUndoneImplCopyWith<_$CharacterUndoneImpl> get copyWith =>
-      __$$CharacterUndoneImplCopyWithImpl<_$CharacterUndoneImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() started,
-    required TResult Function() paused,
-    required TResult Function() resumed,
-    required TResult Function(String character, bool isKnown) characterLearned,
-    required TResult Function(String character) characterUndone,
-    required TResult Function() endSession,
-    required TResult Function() restart,
-  }) {
-    return characterUndone(character);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? started,
-    TResult? Function()? paused,
-    TResult? Function()? resumed,
-    TResult? Function(String character, bool isKnown)? characterLearned,
-    TResult? Function(String character)? characterUndone,
-    TResult? Function()? endSession,
-    TResult? Function()? restart,
-  }) {
-    return characterUndone?.call(character);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? started,
-    TResult Function()? paused,
-    TResult Function()? resumed,
-    TResult Function(String character, bool isKnown)? characterLearned,
-    TResult Function(String character)? characterUndone,
-    TResult Function()? endSession,
-    TResult Function()? restart,
-    required TResult orElse(),
-  }) {
-    if (characterUndone != null) {
-      return characterUndone(character);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Started value) started,
-    required TResult Function(_Paused value) paused,
-    required TResult Function(_Resumed value) resumed,
-    required TResult Function(_CharacterLearned value) characterLearned,
-    required TResult Function(_CharacterUndone value) characterUndone,
-    required TResult Function(_EndSession value) endSession,
-    required TResult Function(_Restart value) restart,
-  }) {
-    return characterUndone(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Started value)? started,
-    TResult? Function(_Paused value)? paused,
-    TResult? Function(_Resumed value)? resumed,
-    TResult? Function(_CharacterLearned value)? characterLearned,
-    TResult? Function(_CharacterUndone value)? characterUndone,
-    TResult? Function(_EndSession value)? endSession,
-    TResult? Function(_Restart value)? restart,
-  }) {
-    return characterUndone?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Started value)? started,
-    TResult Function(_Paused value)? paused,
-    TResult Function(_Resumed value)? resumed,
-    TResult Function(_CharacterLearned value)? characterLearned,
-    TResult Function(_CharacterUndone value)? characterUndone,
-    TResult Function(_EndSession value)? endSession,
-    TResult Function(_Restart value)? restart,
-    required TResult orElse(),
-  }) {
-    if (characterUndone != null) {
-      return characterUndone(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class _CharacterUndone implements LearningSessionEvent {
-  const factory _CharacterUndone({required final String character}) =
-      _$CharacterUndoneImpl;
-
-  String get character;
-
-  /// Create a copy of LearningSessionEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CharacterUndoneImplCopyWith<_$CharacterUndoneImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -915,7 +712,6 @@ class _$EndSessionImpl implements _EndSession {
     required TResult Function() paused,
     required TResult Function() resumed,
     required TResult Function(String character, bool isKnown) characterLearned,
-    required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
     required TResult Function() restart,
   }) {
@@ -929,7 +725,6 @@ class _$EndSessionImpl implements _EndSession {
     TResult? Function()? paused,
     TResult? Function()? resumed,
     TResult? Function(String character, bool isKnown)? characterLearned,
-    TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
     TResult? Function()? restart,
   }) {
@@ -943,7 +738,6 @@ class _$EndSessionImpl implements _EndSession {
     TResult Function()? paused,
     TResult Function()? resumed,
     TResult Function(String character, bool isKnown)? characterLearned,
-    TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
     TResult Function()? restart,
     required TResult orElse(),
@@ -961,7 +755,6 @@ class _$EndSessionImpl implements _EndSession {
     required TResult Function(_Paused value) paused,
     required TResult Function(_Resumed value) resumed,
     required TResult Function(_CharacterLearned value) characterLearned,
-    required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
     required TResult Function(_Restart value) restart,
   }) {
@@ -975,7 +768,6 @@ class _$EndSessionImpl implements _EndSession {
     TResult? Function(_Paused value)? paused,
     TResult? Function(_Resumed value)? resumed,
     TResult? Function(_CharacterLearned value)? characterLearned,
-    TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
     TResult? Function(_Restart value)? restart,
   }) {
@@ -989,7 +781,6 @@ class _$EndSessionImpl implements _EndSession {
     TResult Function(_Paused value)? paused,
     TResult Function(_Resumed value)? resumed,
     TResult Function(_CharacterLearned value)? characterLearned,
-    TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
     TResult Function(_Restart value)? restart,
     required TResult orElse(),
@@ -1050,7 +841,6 @@ class _$RestartImpl implements _Restart {
     required TResult Function() paused,
     required TResult Function() resumed,
     required TResult Function(String character, bool isKnown) characterLearned,
-    required TResult Function(String character) characterUndone,
     required TResult Function() endSession,
     required TResult Function() restart,
   }) {
@@ -1064,7 +854,6 @@ class _$RestartImpl implements _Restart {
     TResult? Function()? paused,
     TResult? Function()? resumed,
     TResult? Function(String character, bool isKnown)? characterLearned,
-    TResult? Function(String character)? characterUndone,
     TResult? Function()? endSession,
     TResult? Function()? restart,
   }) {
@@ -1078,7 +867,6 @@ class _$RestartImpl implements _Restart {
     TResult Function()? paused,
     TResult Function()? resumed,
     TResult Function(String character, bool isKnown)? characterLearned,
-    TResult Function(String character)? characterUndone,
     TResult Function()? endSession,
     TResult Function()? restart,
     required TResult orElse(),
@@ -1096,7 +884,6 @@ class _$RestartImpl implements _Restart {
     required TResult Function(_Paused value) paused,
     required TResult Function(_Resumed value) resumed,
     required TResult Function(_CharacterLearned value) characterLearned,
-    required TResult Function(_CharacterUndone value) characterUndone,
     required TResult Function(_EndSession value) endSession,
     required TResult Function(_Restart value) restart,
   }) {
@@ -1110,7 +897,6 @@ class _$RestartImpl implements _Restart {
     TResult? Function(_Paused value)? paused,
     TResult? Function(_Resumed value)? resumed,
     TResult? Function(_CharacterLearned value)? characterLearned,
-    TResult? Function(_CharacterUndone value)? characterUndone,
     TResult? Function(_EndSession value)? endSession,
     TResult? Function(_Restart value)? restart,
   }) {
@@ -1124,7 +910,6 @@ class _$RestartImpl implements _Restart {
     TResult Function(_Paused value)? paused,
     TResult Function(_Resumed value)? resumed,
     TResult Function(_CharacterLearned value)? characterLearned,
-    TResult Function(_CharacterUndone value)? characterUndone,
     TResult Function(_EndSession value)? endSession,
     TResult Function(_Restart value)? restart,
     required TResult orElse(),

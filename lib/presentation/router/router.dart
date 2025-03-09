@@ -1,126 +1,91 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../pages/character_detail_page.dart';
+import 'package:get_it/get_it.dart';
 import '../pages/learning_plan_list_page.dart';
 import '../pages/learning_plan_page.dart';
 import '../pages/learning_session_page.dart';
+import '../pages/review_page.dart';
 import '../pages/learning_statistics_page.dart';
-import '../bloc/learning_statistics_bloc.dart';
-import '../bloc/learning_plan_bloc.dart';
-import '../bloc/learning_session_bloc.dart';
-import '../../domain/repositories/learning_record_repository.dart';
-import '../../injection.dart';
 import '../../domain/repositories/learning_plan_repository.dart';
+import '../../domain/entities/learning_plan.dart';
 
-// 这里假设 HomePage 等页面在对应的文件中已经正确导入
 final router = GoRouter(
-  initialLocation: '/plans',
+  initialLocation: '/',
   routes: [
+    // 学习计划列表页面（首页）
     GoRoute(
-      path: '/plans',
-      name: 'plans',
+      path: '/',
       builder: (context, state) => const LearningPlanListPage(),
     ),
+    // 创建新学习计划
     GoRoute(
-      path: '/detail',
-      name: 'detail',
-      builder: (context, state) {
-        final extra = state.extra as Map<String, dynamic>;
-        return CharacterDetailPage(
-          title: extra['title'] as String,
-          characters: (extra['characters'] as List<dynamic>).cast<String>(),
-        );
-      },
+      path: '/plan/new',
+      builder: (context, state) => const LearningPlanPage(),
     ),
+    // 编辑学习计划
     GoRoute(
-      path: '/plan/create',
-      name: 'plan_create',
-      builder: (context, state) => BlocProvider(
-        create: (context) => getIt<LearningPlanBloc>(),
-        child: const LearningPlanPage(),
-      ),
-    ),
-    GoRoute(
-      path: '/plan/edit/:id',
-      name: 'plan_edit',
+      path: '/plan/:id',
       builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return FutureBuilder(
-          future: getIt<LearningPlanRepository>().getPlanById(id),
+        final id = state.pathParameters['id'];
+        if (id == null) {
+          return const LearningPlanListPage();
+        }
+        return FutureBuilder<LearningPlan?>(
+          future: GetIt.I<LearningPlanRepository>().getPlanById(id),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (!snapshot.hasData) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-
-            if (snapshot.hasError) {
-              return Scaffold(
-                body: Center(child: Text('错误：${snapshot.error}')),
-              );
-            }
-
             final plan = snapshot.data;
             if (plan == null) {
-              return Scaffold(
-                body: Center(child: Text('未找到学习计划')),
-              );
+              return const LearningPlanListPage();
             }
-
-            return BlocProvider(
-              create: (context) => getIt<LearningPlanBloc>(),
-              child: LearningPlanPage(initialPlan: plan),
-            );
+            return LearningPlanPage(initialPlan: plan);
           },
         );
       },
     ),
+    // 学习会话页面
     GoRoute(
-      path: '/plan/:id/learn',
-      name: 'learn',
+      path: '/learn/:planId',
       builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return FutureBuilder(
-          future: getIt<LearningPlanRepository>().getPlanById(id),
+        final planId = state.pathParameters['planId'];
+        if (planId == null) {
+          return const LearningPlanListPage();
+        }
+        return FutureBuilder<LearningPlan?>(
+          future: GetIt.I<LearningPlanRepository>().getPlanById(planId),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (!snapshot.hasData) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-
-            if (snapshot.hasError) {
-              return Scaffold(
-                body: Center(child: Text('错误：${snapshot.error}')),
-              );
-            }
-
             final plan = snapshot.data;
             if (plan == null) {
-              return const Scaffold(
-                body: Center(child: Text('未找到学习计划')),
-              );
+              return const LearningPlanListPage();
             }
-
-            return BlocProvider(
-              create: (context) => getIt.get<LearningSessionBloc>(param1: plan),
-              child: LearningSessionPage(plan: plan),
-            );
+            return LearningSessionPage(plan: plan);
           },
         );
       },
     ),
+    // 复习页面
     GoRoute(
-      path: '/plan/:id/statistics',
+      path: '/review',
+      builder: (context, state) => const ReviewPage(),
+    ),
+    // 学习统计页面
+    GoRoute(
+      path: '/plan/:planId/statistics',
       builder: (context, state) {
-        final planId = state.pathParameters['id']!;
-        return BlocProvider(
-          create: (context) =>
-              LearningStatisticsBloc(getIt<LearningRecordRepository>())
-                ..add(LearningStatisticsEvent.started(planId)),
-          child: const LearningStatisticsPage(),
-        );
+        final planId = state.pathParameters['planId'];
+        if (planId == null) {
+          return const LearningPlanListPage();
+        }
+        return LearningStatisticsPage(planId: planId);
       },
     ),
   ],

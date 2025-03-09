@@ -14,30 +14,58 @@ class LearningPlanListPage extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           getIt<LearningPlanBloc>()..add(const LearningPlanEvent.started()),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('学习计划'),
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-        ),
-        body: BlocBuilder<LearningPlanBloc, LearningPlanState>(
-          builder: (context, state) {
-            return state.maybeWhen(
-              initial: () => const Center(child: Text('加载中...')),
+      child: BlocBuilder<LearningPlanBloc, LearningPlanState>(
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('学习计划'),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => context.go('/plan/new'),
+                ),
+              ],
+            ),
+            body: state.when(
+              initial: () => const Center(child: CircularProgressIndicator()),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (message) => Center(child: Text('错误：$message')),
               loaded: (plans) => _buildPlanList(context, plans),
-              orElse: () => const SizedBox(),
-            );
-          },
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => context.push('/plan/create'),
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          icon: const Icon(Icons.add),
-          label: const Text('创建计划'),
-        ),
+              error: (message) => Center(child: Text('错误：$message')),
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: 0,
+              onTap: (index) {
+                switch (index) {
+                  case 0:
+                    context.go('/');
+                    break;
+                  case 1:
+                    context.go('/review');
+                    break;
+                  case 2:
+                    // 移除全局统计入口，因为统计是针对具体计划的
+                    break;
+                }
+              },
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.list),
+                  label: '计划',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.refresh),
+                  label: '复习',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.bar_chart),
+                  label: '统计',
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -193,7 +221,7 @@ class LearningPlanListPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   TextButton.icon(
-                    onPressed: () => context.push('/plan/${plan.id}/learn'),
+                    onPressed: () => context.push('/learn/${plan.id}'),
                     icon: const Icon(Icons.play_arrow),
                     label: const Text('开始学习'),
                   ),
