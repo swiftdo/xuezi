@@ -14,24 +14,24 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
-import 'models/learned_character.dart';
+import 'domain/entities/learned_character.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(1, 7491557881740746187),
+      id: const obx_int.IdUid(1, 5160477926189358738),
       name: 'LearnedCharacter',
-      lastPropertyId: const obx_int.IdUid(2, 4045956920332774565),
+      lastPropertyId: const obx_int.IdUid(2, 5534634607978643534),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 3026710698614473021),
+            id: const obx_int.IdUid(1, 1498666042927708426),
             name: 'id',
             type: 6,
             flags: 1),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 4045956920332774565),
+            id: const obx_int.IdUid(2, 5534634607978643534),
             name: 'character',
             type: 9,
             flags: 0)
@@ -75,7 +75,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(1, 7491557881740746187),
+      lastEntityId: const obx_int.IdUid(1, 5160477926189358738),
       lastIndexId: const obx_int.IdUid(0, 0),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),

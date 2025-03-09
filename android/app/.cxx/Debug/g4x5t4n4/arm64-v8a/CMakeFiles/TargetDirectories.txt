@@ -1,0 +1,2 @@
+/Users/laijihua/Desktop/Code/xuezi/android/app/.cxx/Debug/g4x5t4n4/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/laijihua/Desktop/Code/xuezi/android/app/.cxx/Debug/g4x5t4n4/arm64-v8a/CMakeFiles/rebuild_cache.dir
