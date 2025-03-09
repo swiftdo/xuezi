@@ -1,57 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:xuezi/presentation/theme/app_colors.dart';
+import '../widgets/learning_unit_card.dart';
+import '../bloc/learning_units_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('学习列表'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildCharacterSetCard(
-            context,
-            title: '1 - 10 汉字',
-            characters: ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'],
+    return BlocBuilder<LearningUnitsBloc, LearningUnitsState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('学子'),
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.dashboard),
+                onPressed: () => context.go('/dashboard'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.event_note),
+                onPressed: () => context.go('/plans'),
+                tooltip: '学习计划',
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          _buildCharacterSetCard(
-            context,
-            title: '常用问候语',
-            characters: ['你', '好', '早', '晚', '再', '见'],
+          body: state.map(
+            initial: (_) => const Center(child: Text('初始化中...')),
+            loading: (_) => const Center(child: CircularProgressIndicator()),
+            error: (state) => Center(child: Text('错误：${state.message}')),
+            loaded: (state) => ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: state.units.length,
+              itemBuilder: (context, index) {
+                final unitWithProgress = state.units[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: LearningUnitCard(
+                    unit: unitWithProgress.unit,
+                    progress: unitWithProgress.progress,
+                  ),
+                );
+              },
+            ),
           ),
-          const SizedBox(height: 16),
-          _buildCharacterSetCard(
-            context,
-            title: '基础词汇',
-            characters: ['我', '你', '他', '她', '它', '们'],
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => context.go('/plan/create'),
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            icon: const Icon(Icons.add),
+            label: const Text('创建学习计划'),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCharacterSetCard(
-    BuildContext context, {
-    required String title,
-    required List<String> characters,
-  }) {
-    return Card(
-      child: ListTile(
-        title: Text(title),
-        subtitle: Text('包含 ${characters.length} 个汉字'),
-        trailing: const Icon(Icons.arrow_forward_ios),
-        onTap: () {
-          context.push('/detail', extra: {
-            'title': title,
-            'characters': characters,
-          });
-        },
-      ),
+        );
+      },
     );
   }
 }
