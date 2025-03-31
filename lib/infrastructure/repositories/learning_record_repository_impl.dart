@@ -9,22 +9,32 @@ class LearningRecordRepositoryImpl implements LearningRecordRepository {
   static const String _recordsKey = 'learning_records';
   static const String _reviewCharactersKey = 'review_characters';
 
+  List<LearningRecord>? _cachedRecords;
+  List<ReviewCharacter>? _cachedCharacters;
+
   LearningRecordRepositoryImpl(this._prefs);
 
   @override
   Future<void> saveLearningRecord(LearningRecord record) async {
     final records = await getLearningRecords();
     records.add(record);
-    final jsonList = records.map((r) => r.toJson()).toList();
-    await _prefs.setString(_recordsKey, jsonEncode(jsonList));
+    _cachedRecords = records;
+
+    final jsonList = records.map((r) => jsonEncode(r.toJson())).toList();
+    await _prefs.setStringList(_recordsKey, jsonList);
   }
 
   @override
   Future<List<LearningRecord>> getLearningRecords() async {
-    final jsonString = _prefs.getString(_recordsKey);
-    if (jsonString == null) return [];
-    final jsonList = jsonDecode(jsonString) as List;
-    return jsonList.map((json) => LearningRecord.fromJson(json)).toList();
+    if (_cachedRecords != null) {
+      return _cachedRecords!;
+    }
+
+    final jsonList = _prefs.getStringList(_recordsKey) ?? [];
+    _cachedRecords = jsonList
+        .map((jsonString) => LearningRecord.fromJson(jsonDecode(jsonString)))
+        .toList();
+    return _cachedRecords!;
   }
 
   @override
@@ -59,14 +69,25 @@ class LearningRecordRepositoryImpl implements LearningRecordRepository {
   }
 
   Future<List<ReviewCharacter>> _getReviewCharacters() async {
-    final jsonString = _prefs.getString(_reviewCharactersKey);
-    if (jsonString == null) return [];
-    final jsonList = jsonDecode(jsonString) as List;
-    return jsonList.map((json) => ReviewCharacter.fromJson(json)).toList();
+    if (_cachedCharacters != null) {
+      return _cachedCharacters!;
+    }
+
+    final jsonList = _prefs.getStringList(_reviewCharactersKey) ?? [];
+    _cachedCharacters = jsonList
+        .map((jsonString) => ReviewCharacter.fromJson(jsonDecode(jsonString)))
+        .toList();
+    return _cachedCharacters!;
   }
 
   Future<void> _saveReviewCharacters(List<ReviewCharacter> characters) async {
-    final jsonList = characters.map((c) => c.toJson()).toList();
-    await _prefs.setString(_reviewCharactersKey, jsonEncode(jsonList));
+    _cachedCharacters = characters;
+    final jsonList = characters.map((c) => jsonEncode(c.toJson())).toList();
+    await _prefs.setStringList(_reviewCharactersKey, jsonList);
+  }
+
+  void clearCache() {
+    _cachedRecords = null;
+    _cachedCharacters = null;
   }
 }

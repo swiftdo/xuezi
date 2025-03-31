@@ -29,38 +29,49 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     }
   }
 
-  Future<void> _onCharacterReviewed(
-      _CharacterReviewed event, Emitter<ReviewState> emit) async {
-    final currentState = state;
-    if (currentState is! _Loaded) return;
-
+  void _onCharacterReviewed(
+    _CharacterReviewed event,
+    Emitter<ReviewState> emit,
+  ) async {
     try {
-      final characters = [...currentState.reviewCharacters];
-      final index =
-          characters.indexWhere((char) => char.character == event.character);
-      if (index == -1) return;
+      final currentState = state;
+      if (currentState is! _Loaded) return;
 
-      final character = characters[index];
-      final updatedCharacter = ReviewCharacter(
-        character: character.character,
-        learnedAt: character.learnedAt,
-        reviewDates: [...character.reviewDates, DateTime.now()],
-        reviewCount: character.reviewCount + 1,
-        needsReview: !event.remembered,
-        nextReviewDate: event.remembered
-            ? ReviewCharacter.calculateNextReviewDate(
-                character.learnedAt, character.reviewCount + 1)
-            : character.nextReviewDate,
+      final character = event.character;
+      final remembered = event.remembered;
+      final now = DateTime.now();
+
+      // Get the current review character
+      final characters = await _repository.getReviewCharactersForToday();
+      final reviewChar = characters.firstWhere(
+        (c) => c.character == character,
+        orElse: () => throw Exception('Character not found'),
       );
 
-      await _repository.updateReviewCharacter(updatedCharacter);
-      characters.removeAt(index);
+      // Update review character
+      final updatedChar = ReviewCharacter(
+        character: character,
+        learnedAt: reviewChar.learnedAt,
+        reviewDates: [...reviewChar.reviewDates, now],
+        reviewCount: reviewChar.reviewCount + 1,
+        needsReview: !remembered,
+        nextReviewDate: remembered
+            ? ReviewCharacter.calculateNextReviewDate(
+                now,
+                reviewChar.reviewCount + 1,
+              )
+            : ReviewCharacter.calculateNextReviewDate(now, 0),
+      );
+
+      await _repository.updateReviewCharacter(updatedChar);
+
+      // Reload today's review characters
+      final updatedCharacters = await _repository.getReviewCharactersForToday();
 
       emit(ReviewState.loaded(
-        reviewCharacters: characters,
+        reviewCharacters: updatedCharacters,
         totalReviewed: currentState.totalReviewed + 1,
-        totalRemembered:
-            currentState.totalRemembered + (event.remembered ? 1 : 0),
+        totalRemembered: currentState.totalRemembered + (remembered ? 1 : 0),
       ));
     } catch (e) {
       emit(ReviewState.error(e.toString()));

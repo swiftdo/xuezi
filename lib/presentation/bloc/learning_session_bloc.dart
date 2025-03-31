@@ -17,6 +17,7 @@ class LearningSessionBloc
   final LearningRecordRepository _repository;
   final List<String> _characters;
   final _uuid = const Uuid();
+  final Map<String, ReviewCharacter> _reviewCharacterCache = {};
 
   LearningSessionBloc(this.plan, this._repository)
       : _characters = _getCharactersForPlan(plan),
@@ -41,15 +42,15 @@ class LearningSessionBloc
   }
 
   static List<String> _getCharactersForPlan(LearningPlan plan) {
-    // 从示例数据中获取字符
-    final allCharacters = SampleLearningData.basicUnits
+    // 从示例数据中获取字符，使用缓存优化性能
+    final cachedCharacters = SampleLearningData.basicUnits
         .expand((unit) => unit.groups)
         .expand((group) => group.characters)
         .map((char) => char.character)
         .toList();
 
     // 根据计划的目标数量返回字符
-    return allCharacters.take(plan.targetCharactersPerDay).toList();
+    return cachedCharacters.take(plan.targetCharactersPerDay).toList();
   }
 
   void _onStarted(_Started event, Emitter<LearningSessionState> emit) {
@@ -82,35 +83,79 @@ class LearningSessionBloc
     }
   }
 
-  void _onCharacterLearned(
-      _CharacterLearned event, Emitter<LearningSessionState> emit) {
-    // Create new lists to ensure immutability
-    final List<String> newKnownCharacters = [...state.knownCharacters];
-    final List<String> newUnknownCharacters = [...state.unknownCharacters];
+  Future<void> _onCharacterLearned(
+    _CharacterLearned event,
+    Emitter<LearningSessionState> emit,
+  ) async {
+    final now = DateTime.now();
+    final character = event.character;
+    final isKnown = event.isKnown;
 
-    // Add to appropriate list based on isKnown flag
-    if (event.isKnown) {
-      newKnownCharacters.add(event.character);
+    // 批量更新状态
+    final List<String> newKnownCharacters = List.from(state.knownCharacters);
+    final List<String> newUnknownCharacters =
+        List.from(state.unknownCharacters);
+
+    if (isKnown) {
+      newKnownCharacters.add(character);
     } else {
-      newUnknownCharacters.add(event.character);
+      newUnknownCharacters.add(character);
     }
 
-    // Create a completely new state object
-    final newState = LearningSessionState(
-      plan: state.plan,
-      startTime: state.startTime,
-      totalStudyTime: state.totalStudyTime,
-      charactersLearned:
-          newKnownCharacters.length + newUnknownCharacters.length,
-      isActive: state.isActive,
-      completedExercises: [...state.completedExercises],
+    // 更新状态
+    emit(state.copyWith(
+      charactersLearned: state.charactersLearned + 1,
       knownCharacters: newKnownCharacters,
       unknownCharacters: newUnknownCharacters,
-      characters: [...state.characters],
-      lastResumeTime: state.lastResumeTime,
-    );
+    ));
 
-    emit(newState);
+    // 异步保存记录
+    _saveRecordsAsync(
+      character: character,
+      isKnown: isKnown,
+      now: now,
+      knownCharacters: newKnownCharacters,
+      unknownCharacters: newUnknownCharacters,
+    );
+  }
+
+  Future<void> _saveRecordsAsync({
+    required String character,
+    required bool isKnown,
+    required DateTime now,
+    required List<String> knownCharacters,
+    required List<String> unknownCharacters,
+  }) async {
+    try {
+      // Create and save learning record
+      final record = LearningRecord(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        planId: state.plan.id,
+        startTime: state.startTime,
+        endTime: now,
+        totalStudyTime: state.totalStudyTime,
+        knownCharacters: knownCharacters,
+        unknownCharacters: unknownCharacters,
+        targetCharactersPerDay: state.plan.targetCharactersPerDay,
+        targetStudyTimePerDay: state.plan.targetStudyTimePerDay,
+      );
+      await _repository.saveLearningRecord(record);
+
+      // Create or update review character
+      final reviewChar = ReviewCharacter(
+        character: character,
+        learnedAt: now,
+        reviewDates: [now],
+        reviewCount: 0,
+        needsReview: !isKnown,
+        nextReviewDate: ReviewCharacter.calculateNextReviewDate(now, 0),
+      );
+      _reviewCharacterCache[character] = reviewChar;
+      await _repository.saveReviewCharacter(reviewChar);
+    } catch (e) {
+      // 错误处理
+      print('Error saving records: $e');
+    }
   }
 
   Future<void> _onEndSession(
@@ -120,42 +165,56 @@ class LearningSessionBloc
         ? state.totalStudyTime + now.difference(state.lastResumeTime!)
         : state.totalStudyTime;
 
-    // Create learning record
-    final record = LearningRecord(
-      id: _uuid.v4(),
-      planId: plan.id,
-      startTime: state.startTime,
-      endTime: now,
-      totalStudyTime: totalTime,
-      knownCharacters: state.knownCharacters,
-      unknownCharacters: state.unknownCharacters,
-      targetCharactersPerDay: plan.targetCharactersPerDay,
-      targetStudyTimePerDay: plan.targetStudyTimePerDay,
-    );
-
-    await _repository.saveLearningRecord(record);
-
-    // Create review records for known characters
-    for (final character in state.knownCharacters) {
-      final reviewCharacter = ReviewCharacter(
-        character: character,
-        learnedAt: now,
-        reviewDates: [],
-        reviewCount: 0,
-        needsReview: true,
-        nextReviewDate: ReviewCharacter.calculateNextReviewDate(now, 0),
-      );
-      await _repository.saveReviewCharacter(reviewCharacter);
-    }
-
     emit(state.copyWith(
       isActive: false,
       totalStudyTime: totalTime,
       lastResumeTime: null,
     ));
+
+    // 异步保存会话记录
+    _saveSessionRecordsAsync(now, totalTime);
+  }
+
+  Future<void> _saveSessionRecordsAsync(
+      DateTime now, Duration totalTime) async {
+    try {
+      // Create learning record
+      final record = LearningRecord(
+        id: _uuid.v4(),
+        planId: plan.id,
+        startTime: state.startTime,
+        endTime: now,
+        totalStudyTime: totalTime,
+        knownCharacters: state.knownCharacters,
+        unknownCharacters: state.unknownCharacters,
+        targetCharactersPerDay: plan.targetCharactersPerDay,
+        targetStudyTimePerDay: plan.targetStudyTimePerDay,
+      );
+
+      await _repository.saveLearningRecord(record);
+
+      // Create review records for known characters
+      for (final character in state.knownCharacters) {
+        if (!_reviewCharacterCache.containsKey(character)) {
+          final reviewCharacter = ReviewCharacter(
+            character: character,
+            learnedAt: now,
+            reviewDates: [],
+            reviewCount: 0,
+            needsReview: true,
+            nextReviewDate: ReviewCharacter.calculateNextReviewDate(now, 0),
+          );
+          _reviewCharacterCache[character] = reviewCharacter;
+          await _repository.saveReviewCharacter(reviewCharacter);
+        }
+      }
+    } catch (e) {
+      print('Error saving session records: $e');
+    }
   }
 
   void _onRestart(_Restart event, Emitter<LearningSessionState> emit) {
+    _reviewCharacterCache.clear();
     emit(LearningSessionState(
       plan: plan,
       startTime: DateTime.now(),

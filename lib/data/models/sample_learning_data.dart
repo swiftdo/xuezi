@@ -3,13 +3,13 @@ import '../../domain/entities/character.dart';
 
 class SampleLearningData {
   static final List<LearningUnit> basicUnits = [
-    LearningUnit(
+    const LearningUnit(
       id: 'basic_1',
       name: '基础笔画和部件',
       description: '学习汉字最基本的笔画和常用部件',
       targetCount: 20,
       difficulty: 1,
-      estimatedTime: const Duration(days: 7),
+      estimatedTime: Duration(days: 7),
       groups: [
         CharacterGroup(
           name: '基本笔画',
@@ -51,21 +51,21 @@ class SampleLearningData {
                 'examples': ['横', '竖'],
               },
               difficulty: 1,
-              estimatedTime: const Duration(minutes: 10),
+              estimatedTime: Duration(minutes: 10),
             ),
           ],
           commonScenarios: ['书写练习', '部件识别'],
         ),
       ],
     ),
-    LearningUnit(
+    const LearningUnit(
       id: 'basic_2',
       name: '家庭称谓',
       description: '学习家庭成员的称呼',
       targetCount: 10,
       difficulty: 1,
       prerequisites: ['basic_1'],
-      estimatedTime: const Duration(days: 5),
+      estimatedTime: Duration(days: 5),
       groups: [
         CharacterGroup(
           name: '直系亲属',
@@ -109,7 +109,7 @@ class SampleLearningData {
                 'target_words': ['爸爸', '妈妈', '爸妈'],
               },
               difficulty: 1,
-              estimatedTime: const Duration(minutes: 10),
+              estimatedTime: Duration(minutes: 10),
             ),
           ],
           commonScenarios: ['家庭交流', '日常称呼'],

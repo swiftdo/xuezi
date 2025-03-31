@@ -2,102 +2,98 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:go_router/go_router.dart';
 import '../../domain/entities/review_character.dart';
 import '../bloc/review_bloc.dart';
 import '../theme/app_colors.dart';
 import '../../injection.dart';
 
-class ReviewPage extends StatelessWidget {
+class ReviewPage extends StatefulWidget {
   const ReviewPage({super.key});
+
+  @override
+  State<ReviewPage> createState() => _ReviewPageState();
+}
+
+class _ReviewPageState extends State<ReviewPage> {
+  int _currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
           getIt<ReviewBloc>()..add(const ReviewEvent.started()),
-      child: const ReviewPageContent(),
-    );
-  }
-}
-
-class ReviewPageContent extends StatefulWidget {
-  const ReviewPageContent({super.key});
-
-  @override
-  State<ReviewPageContent> createState() => _ReviewPageContentState();
-}
-
-class _ReviewPageContentState extends State<ReviewPageContent> {
-  final FlutterTts flutterTts = FlutterTts();
-  final CardSwiperController controller = CardSwiperController();
-  int currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    flutterTts.setLanguage("zh-CN");
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('每日复习'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: BlocBuilder<ReviewBloc, ReviewState>(
-        builder: (context, state) {
-          return state.when(
-            initial: () => const Center(child: CircularProgressIndicator()),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            loaded: (characters, totalReviewed, totalRemembered) {
-              if (characters.isEmpty) {
-                return const Center(
-                  child: Text('今天没有需要复习的字'),
-                );
-              }
-              return Column(
-                children: [
-                  _buildProgressIndicator(totalReviewed, totalRemembered),
-                  Expanded(
-                    child: CardSwiper(
-                      controller: controller,
-                      cardsCount: characters.length,
-                      onSwipe: (previousIndex, currentIndex, direction) {
-                        if (currentIndex != null) {
-                          setState(() {
-                            this.currentIndex = currentIndex;
-                          });
-                          context.read<ReviewBloc>().add(
-                                ReviewEvent.characterReviewed(
-                                  character:
-                                      characters[previousIndex].character,
-                                  remembered:
-                                      direction == CardSwiperDirection.right,
-                                ),
-                              );
-                        }
-                        return true;
-                      },
-                      isLoop: false,
-                      numberOfCardsDisplayed: 3,
-                      backCardOffset: const Offset(40, 40),
-                      padding: const EdgeInsets.all(24.0),
-                      cardBuilder: (context, index, _, __) {
-                        return _buildCharacterCard(context, characters[index]);
-                      },
-                    ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('每日复习'),
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+        ),
+        body: BlocConsumer<ReviewBloc, ReviewState>(
+          listener: (context, state) {
+            state.maybeWhen(
+              error: (message) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                    backgroundColor: Colors.red,
                   ),
-                  _buildControlButtons(characters),
-                ],
-              );
-            },
-            error: (message) => Center(
-              child: Text('错误：$message'),
+                );
+              },
+              orElse: () {},
+            );
+          },
+          builder: (context, state) {
+            return state.when(
+              initial: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              loaded: (characters, totalReviewed, totalRemembered) {
+                if (characters.isEmpty) {
+                  return const Center(
+                    child: Text('今天没有需要复习的字'),
+                  );
+                }
+                return Column(
+                  children: [
+                    _buildProgressIndicator(totalReviewed, totalRemembered),
+                    Expanded(
+                      child: _buildReviewList(context, characters),
+                    ),
+                  ],
+                );
+              },
+              error: (message) => Center(
+                child: Text('错误：$message'),
+              ),
+            );
+          },
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+            switch (index) {
+              case 0:
+                context.go('/');
+                break;
+              case 1:
+                context.go('/review');
+                break;
+            }
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list),
+              label: '计划',
             ),
-          );
-        },
+            BottomNavigationBarItem(
+              icon: Icon(Icons.refresh),
+              label: '复习',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -158,149 +154,62 @@ class _ReviewPageContentState extends State<ReviewPageContent> {
     );
   }
 
-  Widget _buildCharacterCard(BuildContext context, ReviewCharacter character) {
-    return GestureDetector(
-      onTap: () {
-        flutterTts.speak(character.character);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
+  Widget _buildReviewList(
+      BuildContext context, List<ReviewCharacter> characters) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: characters.length,
+      itemBuilder: (context, index) {
+        final character = characters[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ListTile(
+            title: Text(
+              character.character,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: AppColors.primary,
+                  ),
             ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            subtitle: Text(
+              '上次学习：${_formatDate(character.learnedAt)}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  flex: 4,
-                  child: Center(
-                    child: Hero(
-                      tag: 'character_${character.character}',
-                      child: Text(
-                        character.character,
-                        style:
-                            Theme.of(context).textTheme.displayLarge?.copyWith(
-                                  color: AppColors.primary,
-                                ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.volume_up,
-                              size: 16, color: AppColors.neutral3),
-                          const SizedBox(width: 4),
-                          Text(
-                            '点击听发音',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: AppColors.neutral3,
-                                ),
+                IconButton(
+                  icon: const Icon(Icons.check_circle_outline),
+                  color: AppColors.success,
+                  onPressed: () {
+                    context.read<ReviewBloc>().add(
+                          ReviewEvent.characterReviewed(
+                            character: character.character,
+                            remembered: true,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '向右滑动表示记得，向左滑动表示不记得',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.neutral2,
-                            ),
-                      ),
-                    ],
-                  ),
+                        );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.highlight_off),
+                  color: AppColors.warning,
+                  onPressed: () {
+                    context.read<ReviewBloc>().add(
+                          ReviewEvent.characterReviewed(
+                            character: character.character,
+                            remembered: false,
+                          ),
+                        );
+                  },
                 ),
               ],
             ),
-            Positioned(
-              top: 16,
-              right: 16,
-              child: IconButton(
-                icon: const Icon(Icons.help_outline),
-                color: AppColors.neutral3,
-                onPressed: () => _showHintDialog(context, character),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControlButtons(List<ReviewCharacter> characters) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          FloatingActionButton(
-            heroTag: 'speak',
-            onPressed: () {
-              if (currentIndex < characters.length) {
-                flutterTts.speak(characters[currentIndex].character);
-              }
-            },
-            backgroundColor: AppColors.accent,
-            child: const Icon(Icons.volume_up),
           ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showHintDialog(
-      BuildContext context, ReviewCharacter character) {
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('提示 - ${character.character}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('学习时间：${_formatDate(character.learnedAt)}'),
-            const SizedBox(height: 8),
-            Text('复习次数：${character.reviewCount}'),
-            const SizedBox(height: 8),
-            Text('下次复习：${_formatDate(character.nextReviewDate)}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('知道了'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   String _formatDate(DateTime date) {
     return '${date.month}月${date.day}日';
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    flutterTts.stop();
-    super.dispose();
   }
 }

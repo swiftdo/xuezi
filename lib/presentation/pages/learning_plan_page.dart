@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../domain/entities/learning_plan.dart';
 import '../bloc/learning_plan_bloc.dart';
 import '../theme/app_colors.dart';
+import '../../injection.dart';
 
 class LearningPlanPage extends StatefulWidget {
   final LearningPlan? initialPlan;
@@ -22,11 +23,14 @@ class _LearningPlanPageState extends State<LearningPlanPage> {
   late int _targetCharacters;
   late Duration _targetStudyTime;
   final List<String> _selectedCategories = [];
+  late LearningPlanBloc _learningPlanBloc;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
     _initializeFields();
+    _learningPlanBloc = getIt<LearningPlanBloc>();
   }
 
   void _initializeFields() {
@@ -44,108 +48,105 @@ class _LearningPlanPageState extends State<LearningPlanPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LearningPlanBloc, LearningPlanState>(
-      listener: (context, state) {
-        state.maybeWhen(
-          loaded: (_) {
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  widget.initialPlan == null ? '创建成功' : '更新成功',
-                ),
-                backgroundColor: Colors.green,
-              ),
-            );
-            if (!context.mounted) return;
-            context.pop();
-          },
-          error: (message) {
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('错误：$message'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          },
-          orElse: () {},
-        );
-      },
-      child: WillPopScope(
-        onWillPop: () async {
-          if (!context.mounted) return true;
-          context
-              .read<LearningPlanBloc>()
-              .add(const LearningPlanEvent.started());
-          return true;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(widget.initialPlan == null ? '创建学习计划' : '编辑学习计划'),
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                context
-                    .read<LearningPlanBloc>()
-                    .add(const LearningPlanEvent.started());
-                context.pop();
-              },
-            ),
-            actions: [
-              if (widget.initialPlan != null)
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: _showDeleteConfirmation,
-                  tooltip: '删除计划',
-                ),
-            ],
-          ),
-          body: Form(
-            key: _formKey,
-            child: ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: '计划名称',
-                    hintText: '例如：HSK3级备考计划',
+    return BlocProvider.value(
+      value: _learningPlanBloc,
+      child: BlocListener<LearningPlanBloc, LearningPlanState>(
+        listener: (context, state) {
+          state.maybeWhen(
+            loaded: (plans) {
+              if (!context.mounted) return;
+              if (_isSaving) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      widget.initialPlan == null ? '创建成功' : '更新成功',
+                    ),
+                    backgroundColor: Colors.green,
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '请输入计划名称';
-                    }
-                    return null;
-                  },
+                );
+                context.go('/');
+              }
+            },
+            error: (message) {
+              if (!context.mounted) return;
+              setState(() {
+                _isSaving = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('错误：$message'),
+                  backgroundColor: Colors.red,
                 ),
-                const SizedBox(height: 16),
-                _buildDateRangePicker(),
-                const SizedBox(height: 16),
-                _buildDailyGoalsSection(),
-                const SizedBox(height: 16),
-                _buildCategoriesSection(),
-                const SizedBox(height: 24),
-                BlocBuilder<LearningPlanBloc, LearningPlanState>(
-                  builder: (context, state) {
-                    return state.maybeWhen(
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      orElse: () => ElevatedButton(
-                        onPressed: _savePlan,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: const Text('保存计划'),
-                      ),
-                    );
-                  },
-                ),
+              );
+            },
+            orElse: () {},
+          );
+        },
+        child: Builder(
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              title: Text(widget.initialPlan == null ? '创建学习计划' : '编辑学习计划'),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  context.go('/');
+                },
+              ),
+              actions: [
+                if (widget.initialPlan != null)
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: _showDeleteConfirmation,
+                    tooltip: '删除计划',
+                  ),
               ],
+            ),
+            body: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.all(16.0),
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: '计划名称',
+                      hintText: '例如：HSK3级备考计划',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '请输入计划名称';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDateRangePicker(),
+                  const SizedBox(height: 16),
+                  _buildDailyGoalsSection(),
+                  const SizedBox(height: 16),
+                  _buildCategoriesSection(),
+                  const SizedBox(height: 24),
+                  BlocBuilder<LearningPlanBloc, LearningPlanState>(
+                    builder: (context, state) {
+                      return state.maybeWhen(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        orElse: () => ElevatedButton(
+                          onPressed: () => _savePlan(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text('保存计划'),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -323,7 +324,8 @@ class _LearningPlanPageState extends State<LearningPlanPage> {
     }
   }
 
-  void _savePlan() {
+  void _savePlan(BuildContext context) {
+    if (_isSaving) return;
     if (_formKey.currentState!.validate()) {
       if (_endDate.isBefore(_startDate)) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -355,6 +357,20 @@ class _LearningPlanPageState extends State<LearningPlanPage> {
         return;
       }
 
+      if (_selectedCategories.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('请至少选择一个学习类别'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _isSaving = true;
+      });
+
       final plan = LearningPlan(
         id: widget.initialPlan?.id ??
             DateTime.now().millisecondsSinceEpoch.toString(),
@@ -370,18 +386,25 @@ class _LearningPlanPageState extends State<LearningPlanPage> {
       );
 
       if (widget.initialPlan != null) {
-        context
-            .read<LearningPlanBloc>()
-            .add(LearningPlanEvent.updatePlan(plan));
+        _learningPlanBloc.add(LearningPlanEvent.updatePlan(plan));
       } else {
-        context.read<LearningPlanBloc>().add(LearningPlanEvent.savePlan(plan));
+        _learningPlanBloc.add(LearningPlanEvent.savePlan(plan));
       }
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          setState(() {
+            _isSaving = false;
+          });
+        }
+      });
     }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _learningPlanBloc.close();
     super.dispose();
   }
 }

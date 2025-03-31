@@ -34,15 +34,11 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => LearningSessionBloc(
-        widget.plan,
-        getIt<LearningRecordRepository>(),
-      )..add(const LearningSessionEvent.started()),
+      create: (context) => getIt.get<LearningSessionBloc>(param1: widget.plan)
+        ..add(const LearningSessionEvent.started()),
       child: BlocConsumer<LearningSessionBloc, LearningSessionState>(
         listener: (context, state) {
-          // Add debug print to verify state updates
-          print('Known characters: ${state.knownCharacters.length}');
-          print('Unknown characters: ${state.unknownCharacters.length}');
+          // Handle state changes if needed
         },
         builder: (context, state) {
           return Scaffold(
@@ -450,10 +446,9 @@ class _LearningSessionPageState extends State<LearningSessionPage> {
               // Replace current page with a new instance
               if (!mounted) return;
               // Create a new bloc and replace the current one
-              final newBloc = LearningSessionBloc(
-                widget.plan,
-                getIt<LearningRecordRepository>(),
-              )..add(const LearningSessionEvent.started());
+              final newBloc = getIt.get<LearningSessionBloc>(
+                  param1: widget.plan)
+                ..add(const LearningSessionEvent.started());
 
               // Replace the bloc
               context.read<LearningSessionBloc>().close();

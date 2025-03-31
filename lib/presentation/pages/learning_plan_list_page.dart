@@ -6,15 +6,35 @@ import '../../injection.dart';
 import '../bloc/learning_plan_bloc.dart';
 import '../theme/app_colors.dart';
 
-class LearningPlanListPage extends StatelessWidget {
+class LearningPlanListPage extends StatefulWidget {
   const LearningPlanListPage({super.key});
+
+  @override
+  State<LearningPlanListPage> createState() => _LearningPlanListPageState();
+}
+
+class _LearningPlanListPageState extends State<LearningPlanListPage> {
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
           getIt<LearningPlanBloc>()..add(const LearningPlanEvent.started()),
-      child: BlocBuilder<LearningPlanBloc, LearningPlanState>(
+      child: BlocConsumer<LearningPlanBloc, LearningPlanState>(
+        listener: (context, state) {
+          state.maybeWhen(
+            error: (message) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            },
+            orElse: () {},
+          );
+        },
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
@@ -35,17 +55,17 @@ class LearningPlanListPage extends StatelessWidget {
               error: (message) => Center(child: Text('错误：$message')),
             ),
             bottomNavigationBar: BottomNavigationBar(
-              currentIndex: 0,
+              currentIndex: _currentIndex,
               onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
                 switch (index) {
                   case 0:
                     context.go('/');
                     break;
                   case 1:
                     context.go('/review');
-                    break;
-                  case 2:
-                    // 移除全局统计入口，因为统计是针对具体计划的
                     break;
                 }
               },
@@ -57,10 +77,6 @@ class LearningPlanListPage extends StatelessWidget {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.refresh),
                   label: '复习',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.bar_chart),
-                  label: '统计',
                 ),
               ],
             ),
@@ -156,7 +172,7 @@ class LearningPlanListPage extends StatelessWidget {
                     if (!context.mounted) return;
                     await context
                         .push<void>(
-                      '/plan/edit/${plan.id}',
+                      '/plan/${plan.id}',
                     )
                         .then((_) {
                       if (!context.mounted) return;
