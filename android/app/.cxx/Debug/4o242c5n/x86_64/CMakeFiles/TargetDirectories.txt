@@ -1,0 +1,2 @@
+/Users/laijihua/Desktop/Code/xuezi/android/app/.cxx/Debug/4o242c5n/x86_64/CMakeFiles/edit_cache.dir
+/Users/laijihua/Desktop/Code/xuezi/android/app/.cxx/Debug/4o242c5n/x86_64/CMakeFiles/rebuild_cache.dir

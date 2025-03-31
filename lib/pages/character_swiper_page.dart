@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:xuezi/core/models/charater_item.dart';
 
 class CharacterSwiperPage extends StatefulWidget {
-  final List<String> characters;
+  final List<CharacterItem> characters;
   final FlutterTts flutterTts;
 
   const CharacterSwiperPage({
@@ -19,8 +20,13 @@ class CharacterSwiperPage extends StatefulWidget {
 class _CharacterSwiperPageState extends State<CharacterSwiperPage> {
   int currentIndex = 0;
 
-  Future<void> _speak(String text) async {
+  Future<void> _speak(CharacterItem character) async {
     await widget.flutterTts.setLanguage('zh-CN');
+
+    String text = character.character;
+    if (character.desc != null) {
+      text += ".......${character.desc!}";
+    }
     await widget.flutterTts.speak(text);
   }
 
@@ -46,7 +52,7 @@ class _CharacterSwiperPageState extends State<CharacterSwiperPage> {
               color: Colors.white,
               alignment: Alignment.center,
               child: Text(
-                widget.characters[index],
+                widget.characters[index].character,
                 style: const TextStyle(fontSize: 200),
               ),
             ),

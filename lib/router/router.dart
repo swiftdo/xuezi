@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:xuezi/core/models/charater_item.dart';
 import '../pages/home_page.dart';
 import '../pages/character_swiper_page.dart';
 
@@ -14,7 +15,7 @@ final GoRouter router = GoRouter(
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
         return CharacterSwiperPage(
-          characters: extra['characters'] as List<String>,
+          characters: extra['characters'] as List<CharacterItem>,
           flutterTts: extra['flutterTts'],
         );
       },
